@@ -28,6 +28,9 @@
     .refresh-btn:hover { background:rgba(255,255,255,0.2); }
     .refresh-btn:disabled { opacity:0.4; cursor:not-allowed; }
     .status-bar { font-size:12px; color:rgba(255,255,255,0.6); display:flex; align-items:center; gap:6px; }
+    .header-notice { font-size:12px; color:rgba(255,255,255,0.7); line-height:1.7; max-width:580px; margin:1rem auto 0; text-align:center; padding:0 1rem; }
+    .header-notice a { color:#e8a020; font-weight:600; text-decoration:none; }
+    .header-notice a:hover { text-decoration:underline; }
     .live-dot { width:7px; height:7px; border-radius:50%; background:#1D9E75; display:inline-block; }
     .err-dot  { width:7px; height:7px; border-radius:50%; background:#E24B4A; display:inline-block; }
 
@@ -139,6 +142,42 @@
     .hl-stats { color:#555; }
     .highlights-loading { padding:0.75rem 0; font-size:13px; color:#aaa; }
     .highlights-empty { padding:0.75rem 0; font-size:13px; color:#aaa; font-style:italic; }
+
+    /* MOBILE STATS */
+    @media (max-width:700px) {
+      .card-right { display:none; }
+      .card-header { grid-template-columns:56px 1fr; }
+      .site-header h1 { font-size:26px; }
+      .tab { padding:11px 14px; font-size:11px; }
+      .mobile-stats { display:flex; gap:1rem; padding:0 1.25rem 0.75rem; flex-wrap:wrap; }
+      .mobile-stat-value { font-size:16px; font-weight:700; color:#1a1a2e; line-height:1; }
+      .mobile-stat-label { font-size:10px; color:#aaa; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:2px; }
+      .expand-arrow { font-size:18px; color:#e8a020; font-weight:900; }
+    }
+    @media (min-width:701px) {
+      .mobile-stats { display:none; }
+    }
+
+    .mobile-tap-hint { display:none; }
+    @media (max-width:700px) {
+      .mobile-tap-hint { display:block; font-size:10px; color:#e8a020; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:0 1.25rem 0.85rem; }
+      .player-card.no-stats .mobile-tap-hint { display:none; }
+    }
+
+    /* TABS */
+    .tabs { display:flex; gap:0; border-bottom:2px solid #e0e0e0; background:#fff; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow-x:auto; }
+    .tab { padding:13px 22px; font-size:12px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:#888; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:color 0.15s,border-color 0.15s; white-space:nowrap; }
+    .tab:hover { color:#1a1a2e; }
+    .tab.active { color:#1a1a2e; border-bottom-color:#e8a020; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    /* KBO/FL pills */
+    .lv-kbo { background:#c0392b; }
+    .lv-fl  { background:#27500A; }
+    .lv-npb { background:#c0392b; display:inline-flex; align-items:center; }
+    /* Scroll wrap for game log */
+    .game-log-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .game-log table { min-width:280px; }
   </style>
 </head>
 <body>
@@ -155,6 +194,10 @@
     <div class="tagline">
       Tracking how Adelaide Giants alumni are performing in the Major and Minor Leagues.
     </div>
+    <div class="header-notice">
+      Please scroll through and click on each player for more detail. This website is best viewed on a desktop.
+      This is just the test before full roll out — send feedback to <a href="mailto:eric.balnar@baseball.com.au">eric.balnar@baseball.com.au</a>
+    </div>
     <div class="header-actions">
       <button class="refresh-btn" id="refresh-btn" onclick="loadAll()">↻ Refresh stats</button>
       <div class="status-bar" id="status">Loading…</div>
@@ -164,23 +207,43 @@
 
 
 
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('active')">⚾ MLB / Minor Leagues</div>
+  <div class="tab" onclick="switchTab('kbo')">🇰🇷 Korea (KBO)</div>
+  <div class="tab" onclick="switchTab('japan')">🇯🇵 Japan (NPB)</div>
+  <div class="tab" onclick="switchTab('fl')">🌿 Frontier League</div>
+</div>
+
 <div class="container">
-  <!-- NOTICE -->
-  <div style="background:#fff;border-left:4px solid #e8a020;padding:10px 16px;margin-top:1.25rem;border-radius:0 8px 8px 0;font-size:12px;color:#555;line-height:1.6;">
-    <strong style="color:#1a1a2e;">Note:</strong> This tracker only includes players who currently hold an active MLB or MLB-affiliate contract.
-  </div>
-
-  <!-- HIGHLIGHTS -->
-  <div class="highlights-section" id="highlights-section">
-    <div class="highlights-header">
-      <span class="highlights-title">⚡ Today's Highlights</span>
-      <span class="highlights-date" id="highlights-date"></span>
-      <div class="highlights-line"></div>
+  <!-- TAB PANELS -->
+  <div class="tab-panel active" id="panel-active">
+    <!-- NOTICE -->
+    <div style="background:#fff;border-left:4px solid #e8a020;padding:10px 16px;margin-top:1.25rem;border-radius:0 8px 8px 0;font-size:12px;color:#555;line-height:1.6;">
+      <strong style="color:#1a1a2e;">Note:</strong> This tracker only includes players who currently hold an active MLB or MLB-affiliate contract.
     </div>
-    <div id="highlights-container"><div class="highlights-loading">Fetching game logs…</div></div>
+    <!-- HIGHLIGHTS -->
+    <div class="highlights-section" id="highlights-section">
+      <div class="highlights-header">
+        <span class="highlights-title">⚡ Today's Highlights</span>
+        <span class="highlights-date" id="highlights-date"></span>
+        <div class="highlights-line"></div>
+      </div>
+      <div id="highlights-container"><div class="highlights-loading">Fetching game logs…</div></div>
+    </div>
+    <div id="active-list"></div>
   </div>
 
-  <div id="active-list"></div>
+  <div class="tab-panel" id="panel-kbo">
+    <div id="kbo-list"></div>
+  </div>
+
+  <div class="tab-panel" id="panel-japan">
+    <div id="japan-list"></div>
+  </div>
+
+  <div class="tab-panel" id="panel-fl">
+    <div id="fl-list"></div>
+  </div>
 
   <div class="site-footer">
     Adelaide Giants Alumni Tracker &nbsp;|&nbsp; Stats via MLB Stats API &nbsp;|&nbsp; Photos via MLB.com
@@ -219,30 +282,34 @@ function profileUrl(p, level) {
 
 const PLAYERS = [
   // MLB
-  { id:678554, name:"Curtis Mead",       pos:"1B/3B", type:"hitter",  giantsYears:"2022", sportIds:[1,...MILB_IDS] },
-  { id:681351, name:"Logan O'Hoppe",     pos:"C",     type:"hitter",  giantsYears:"2020", sportIds:[1,...MILB_IDS] },
-  { id:663897, name:"Luke Williams",     pos:"IF/OF", type:"hitter",  giantsYears:"2021", sportIds:[1,...MILB_IDS] },
+  { id:678554, name:"Curtis Mead", australian:true,       pos:"1B/3B", type:"hitter",  giantsYears:"2022", sportIds:[1,...MILB_IDS] },
+  { id:681351, name:"Logan O'Hoppe", australian:true,     pos:"C",     type:"hitter",  giantsYears:"2020", sportIds:[1,...MILB_IDS] },
+  { id:663897, name:"Luke Williams", australian:true,     pos:"IF/OF", type:"hitter",  giantsYears:"2021", sportIds:[1,...MILB_IDS] },
 
   // Active MiLB - 2026 Giants
   { id:683569, name:"Jose Colmenares",   pos:"SS",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
-  { id:806730, name:"Drew Davies",       pos:"OF",    type:"hitter",  giantsYears:"2024–2026", sportIds:MILB_IDS },
+  { id:806730, name:"Drew Davies", australian:true,       pos:"OF",    type:"hitter",  giantsYears:"2024–2026", sportIds:MILB_IDS },
   { id:808232, name:"Alirio Ferrebus",   pos:"C/1B",  type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
   { id:699712, name:"Raylin Heredia",    pos:"OF",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
   { id:800272, name:"Manolfi Jimenez",   pos:"OF",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
   { id:699707, name:"Danyony Pulido",    pos:"RHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
   { id:701320, name:"Camron Hill",       pos:"LHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
-  { id:681973, name:"Josh Hendrickson",  pos:"LHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
-  { id:816305, name:"Alistair Tanner",   pos:"P",     type:"pitcher", giantsYears:"2024–2026", sportIds:MILB_IDS },
+  { id:681973, name:"Josh Hendrickson", australian:true,  pos:"LHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
+  { id:816305, name:"Alistair Tanner", australian:true,   pos:"P",     type:"pitcher", giantsYears:"2024–2026", sportIds:MILB_IDS },
 
   // Active MiLB - 2025 Giants
   { id:691276, name:"Luis Caicuto",      pos:"C",     type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
-  { id:800444, name:"Nikau Pouaka-Grego",pos:"IF",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
-  { id:802531, name:"Trent Farquhar",    pos:"IF",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:800444, name:"Nikau Pouaka-Grego", australian:true,pos:"IF",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:802531, name:"Trent Farquhar", australian:true,    pos:"IF",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
   { id:693732, name:"Estibenzon Jimenez",pos:"RHP",   type:"pitcher", giantsYears:"2025", sportIds:MILB_IDS },
-  { id:678620, name:"Blake Townsend",    pos:"LHP",   type:"pitcher", giantsYears:"2025", sportIds:MILB_IDS },
-  { id:666748, name:"Mitch Neunborn",    pos:"RHP",   type:"pitcher", giantsYears:"2022–2024", sportIds:MILB_IDS },
-  { id:681495, name:"Cade Fergus",       pos:"OF",    type:"hitter",  giantsYears:"2024", sportIds:MILB_IDS },
-  { id:805634, name:"Braeden Fausnaught",pos:"LHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+  { id:678620, name:"Blake Townsend", australian:true,    pos:"LHP",   type:"pitcher", giantsYears:"2025", sportIds:MILB_IDS },
+  { id:666748, name:"Mitch Neunborn", australian:true,    pos:"RHP",   type:"pitcher", giantsYears:"2022–2024", sportIds:MILB_IDS },
+  { id:681495, name:"Cade Fergus", australian:true,       pos:"OF",    type:"hitter",  giantsYears:"2024", sportIds:MILB_IDS },
+  { id:805634, name:"Braeden Fausnaught", australian:true,pos:"LHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+
+  // New additions
+  { id:815694, name:"Lou Albrecht", australian:true,       pos:"C",     type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:816303, name:"Jack Bushell", australian:true,       pos:"RHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
 
   // Alumni - older / released
   { id:688011, name:"Cam Wynne",         pos:"RHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
@@ -250,30 +317,63 @@ const PLAYERS = [
   { id:800550, name:"Miguel Cienfuegos", pos:"RHP",   type:"pitcher", giantsYears:"2023", sportIds:MILB_IDS },
 ];
 
+const KBO_PLAYERS = [
+  { name:"Lachlan Wells",    pos:"LHP", type:"pitcher", giantsYears:"2025", level:"KBO", team:"LG Twins",     teamId:null, australian:true, kboStats:{era:"2.06",g:7,gs:7,ip:"39.1",w:2,l:2,k:28,bb:10,whip:"0.97"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=55348" },
+  { name:"Jack O'Loughlin",  pos:"LHP", type:"pitcher", giantsYears:"2026", level:"KBO", team:"Samsung Lions", teamId:null, australian:true, kboStats:{era:"3.38",g:8,gs:8,ip:"37.1",w:2,l:2,k:35,bb:14,whip:"1.34"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=56464" },
+  { name:"Byung-Heon Lee",   pos:"OF",  type:"hitter",  giantsYears:"2024", level:"KBO", team:"Samsung Lions", teamId:null, australian:false, kboStats:null, kboNote:"Yet to appear in KBO in 2026", profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoHitter/Summary.aspx?pcode=69428" },
+  { name:"Seung-Hyun Lee",   pos:"LHP", type:"pitcher", giantsYears:"2024", level:"KBO", team:"Samsung Lions", teamId:null, australian:false, kboStats:{era:"14.81",g:3,gs:3,ip:"10.1",w:0,l:2,k:6,bb:12,whip:"3.00"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=51454" },
+];
+
+const JAPAN_PLAYERS = [
+  // Yomiuri Giants — active 1st team
+  { name:"Yusei Ishizuka",  pos:"OF",  type:"hitter",  giantsYears:"2026", level:"NPB", team:"Yomiuri Giants",  teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_g_m.gif", australian:true, npbStats:{avg:".091",g:3,hr:0,rbi:2,obp:".091"}, profileUrl:"https://npb.jp/bis/eng/players/61165150.html" },
+  // Yomiuri Giants — in minor leagues
+  { name:"Yu Aramaki",      pos:"P",   type:"pitcher", giantsYears:"2026", level:"NPB", team:"Yomiuri Giants",  teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_g_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/players/71175150.html" },
+  { name:"Yamato Shiroki",  pos:"P",   type:"pitcher", giantsYears:"2026", level:"NPB", team:"Yomiuri Giants",  teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_g_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/teams/rst_g.html" },
+  { name:"Tomoki Tamura",   pos:"P",   type:"pitcher", giantsYears:"2026", level:"NPB", team:"Yomiuri Giants",  teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_g_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/teams/rst_g.html" },
+  { name:"Ryusie Yamada",   pos:"P",   type:"pitcher", giantsYears:"2025", level:"NPB", team:"Yomiuri Giants",  teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_g_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/teams/rst_g.html" },
+  { name:"Makoto Kyamoto",  pos:"P",   type:"pitcher", giantsYears:"2025", level:"NPB", team:"Yomiuri Giants",  teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_g_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/teams/rst_g.html" },
+  // Softbank Hawks — in minor leagues
+  { name:"Yuta Akihiro",    pos:"P",   type:"pitcher", giantsYears:"2025", level:"NPB", team:"Fukuoka SoftBank Hawks", teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_h_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/teams/rst_h.html" },
+];
+
+const FL_PLAYERS = [
+  { name:"Cooper Morgan", pos:"LHP", type:"pitcher", giantsYears:"2026", level:"FL", team:"Quebec Capitales", teamId:null, australian:true, flStats:{era:"0.00",g:1,gs:0,ip:"2.0",w:0,l:0,k:1,bb:1,whip:"0.50"}, profileUrl:"https://pro.iscorecentral.com/FL/players/2f8de703-bf81-4ba1-bee8-ba2e9edeccf2" },
+  { name:"Ky Hampton",    pos:"RHP", type:"pitcher", giantsYears:"2026", level:"FL", team:"Down East Bird Dawgs", teamId:null, australian:true, flStats:null, profileUrl:null },
+];
+
+const MANUAL_UPDATE_DATE = "13 May 2026";
+
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 
-function hStatsHtml(s) {
-  if (!s) return "";
+function hStatsHtml(s, extra) {
+  const src = s || extra;
+  if (!src) return "";
   return `<div class="player-stats">
-    <div><div class="stat-value">${d(s.avg)}</div><div class="stat-label">AVG</div></div>
-    <div><div class="stat-value">${d(s.homeRuns)}</div><div class="stat-label">HR</div></div>
-    <div><div class="stat-value">${d(s.rbi)}</div><div class="stat-label">RBI</div></div>
-    <div><div class="stat-value">${d(s.ops)}</div><div class="stat-label">OPS</div></div>
+    <div><div class="stat-value">${d(src.avg)}</div><div class="stat-label">AVG</div></div>
+    <div><div class="stat-value">${d(src.homeRuns??src.hr??0)}</div><div class="stat-label">HR</div></div>
+    <div><div class="stat-value">${d(src.rbi)}</div><div class="stat-label">RBI</div></div>
+    <div><div class="stat-value">${d(src.ops??src.obp)}</div><div class="stat-label">${src.ops?"OPS":"OBP"}</div></div>
   </div>`;
 }
-function pStatsHtml(s) {
-  if (!s) return "";
+function pStatsHtml(s, extra) {
+  const src = s || extra;
+  if (!src) return "";
   return `<div class="player-stats">
-    <div><div class="stat-value">${d(s.era)}</div><div class="stat-label">ERA</div></div>
-    <div><div class="stat-value">${d(s.inningsPitched)}</div><div class="stat-label">IP</div></div>
-    <div><div class="stat-value">${d(s.strikeOuts)}</div><div class="stat-label">K</div></div>
-    <div><div class="stat-value">${d(s.whip)}</div><div class="stat-label">WHIP</div></div>
+    <div><div class="stat-value">${d(src.era)}</div><div class="stat-label">ERA</div></div>
+    <div><div class="stat-value">${d(src.inningsPitched??src.ip)}</div><div class="stat-label">IP</div></div>
+    <div><div class="stat-value">${d(src.strikeOuts??src.k)}</div><div class="stat-label">K</div></div>
+    <div><div class="stat-value">${d(src.whip)}</div><div class="stat-label">WHIP</div></div>
   </div>`;
 }
 
-function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel) {
-  const hasStats = !!seasonStats;
-  const statsHtml = p.type==="hitter" ? hStatsHtml(seasonStats) : pStatsHtml(seasonStats);
+function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel, extraStats) {
+  const hasStats = !!(seasonStats || extraStats);
+  const minorsNote = p.npbNote || p.kboNote || null;
+  const noStatsLabel = !hasStats && minorsNote
+    ? `<div style="font-size:10px;font-weight:800;letter-spacing:0.08em;color:#aaa;text-transform:uppercase;padding:2px 0;">No NPB/KBO stats — player in minors</div>`
+    : "";
+  const statsHtml = p.type==="hitter" ? hStatsHtml(seasonStats, extraStats) : pStatsHtml(seasonStats, extraStats);
   const logo = teamId
     ? `<img class="team-logo" src="${teamLogoUrl(teamId)}" alt="" onerror="this.style.display='none'">`
     : `<div class="team-ball">⚾</div>`;
@@ -294,13 +394,31 @@ function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel) {
 
   const escapedName = p.name.replace(/'/g,"\\'");
   const escapedTeam = team.replace(/'/g,"\\'");
+  const ausFlag = p.australian ? ' 🇦🇺' : '';
+
+  // Mobile stat summary
+  let mobileStat = "";
+  const mSrc = seasonStats || extraStats;
+  if (mSrc) {
+    if (p.type === "hitter") {
+      mobileStat = `<div><div class="mobile-stat-value">${d(mSrc.avg)}</div><div class="mobile-stat-label">AVG</div></div>
+        <div><div class="mobile-stat-value">${d(mSrc.homeRuns??mSrc.hr??0)}</div><div class="mobile-stat-label">HR</div></div>
+        <div><div class="mobile-stat-value">${d(mSrc.rbi)}</div><div class="mobile-stat-label">RBI</div></div>
+        <div><div class="mobile-stat-value">${d(mSrc.ops??mSrc.obp)}</div><div class="mobile-stat-label">${mSrc.ops?"OPS":"OBP"}</div></div>`;
+    } else {
+      mobileStat = `<div><div class="mobile-stat-value">${d(mSrc.era)}</div><div class="mobile-stat-label">ERA</div></div>
+        <div><div class="mobile-stat-value">${d(mSrc.inningsPitched??mSrc.ip)}</div><div class="mobile-stat-label">IP</div></div>
+        <div><div class="mobile-stat-value">${d(mSrc.strikeOuts??mSrc.k)}</div><div class="mobile-stat-label">K</div></div>
+        <div><div class="mobile-stat-value">${d(mSrc.whip)}</div><div class="mobile-stat-label">WHIP</div></div>`;
+    }
+  }
 
   return `
   <div class="player-card ${!hasStats?"no-stats":""}" id="card-${cardId}">
     <div class="card-header" onclick="toggleCard('${cardId}',${p.id||"null"},'${p.type}','${level}','${escapedTeam}','${p.pos}','${leagueLabel}','${pUrl||""}')">
       <div>${photo}</div>
       <div>
-        <div class="player-name">${p.name}</div>
+        <div class="player-name">${p.name}${ausFlag}</div>
         <div class="player-meta"><strong>${p.pos}</strong></div>
         <div class="badges">
           <span class="badge ${badgeCls}">${level}</span>
@@ -308,6 +426,9 @@ function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel) {
           ${profileBtn}
         </div>
       </div>
+      <div class="mobile-stats">${mobileStat}</div>
+      ${!mSrc && minorsNote ? '<div style="font-size:10px;font-weight:800;letter-spacing:0.06em;color:#aaa;text-transform:uppercase;padding:0 1.25rem 0.75rem;">No NPB/KBO stats — player in minors</div>' : ''}
+      <div class="mobile-tap-hint">▼ Tap for game log</div>
       <div class="card-right">
         <div class="player-team">
           ${logo}
@@ -316,8 +437,8 @@ function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel) {
             <div class="team-sub">${leagueLabel}</div>
           </div>
         </div>
-        ${statsHtml ? `<div class="divider-v"></div>${statsHtml}` : ""}
-        <div class="expand-arrow" id="arrow-${cardId}">▼</div>
+        ${statsHtml ? `<div class="divider-v"></div>${statsHtml}` : noStatsLabel ? `<div class="divider-v"></div><div style="display:flex;align-items:center;padding:0 1rem;">${noStatsLabel}</div>` : ""}
+        <div class="expand-arrow" id="arrow-${cardId}" title="Tap for game log">▼</div>
       </div>
     </div>
     <div class="game-log" id="log-${cardId}" data-level="${level}" data-purl="${pUrl||""}"></div>
@@ -377,40 +498,42 @@ function renderGameLog(games, type, logEl, snapshotHtml) {
   }
 
   let tableHtml = "";
+  const abbr = (name) => {
+    if (!name || name==="—") return "—";
+    const map = {"Yankees":"NYY","Mets":"NYM","Dodgers":"LAD","Angels":"LAA","Cubs":"CHC","White Sox":"CWS","Giants":"SFG","Red Sox":"BOS","Astros":"HOU","Braves":"ATL","Nationals":"WSH","Marlins":"MIA","Phillies":"PHI","Pirates":"PIT","Reds":"CIN","Guardians":"CLE","Tigers":"DET","Brewers":"MIL","Twins":"MIN","Cardinals":"STL","Diamondbacks":"ARI","Rockies":"COL","Padres":"SDP","Mariners":"SEA","Rays":"TBR","Rangers":"TEX","Blue Jays":"TOR","Royals":"KCR","Athletics":"OAK","Orioles":"BAL"};
+    for (const [k,v] of Object.entries(map)) if (name.includes(k)) return v;
+    return name.split(" ").pop().slice(0,3).toUpperCase();
+  };
   if (type === "hitter") {
     tableHtml = `<table><thead><tr>
-      <th>Date</th><th>Game</th>
-      <th class="r">AB</th><th class="r">R</th><th class="r">H</th>
-      <th class="r">2B</th><th class="r">3B</th><th class="r">HR</th>
-      <th class="r">RBI</th><th class="r">BB</th><th class="r">K</th><th class="r">SB</th>
+      <th>Date</th><th>Opp</th>
+      <th class="r">AB</th><th class="r">H</th><th class="r">HR</th>
+      <th class="r">RBI</th><th class="r">BB</th>
     </tr></thead><tbody>`;
     for (const g of games) {
       const s  = g.stat;
-      const vs = g.isHome ? `vs ${g.opponent?.name||"—"}` : `@ ${g.opponent?.name||"—"}`;
+      const vs = g.isHome ? `vs ${abbr(g.opponent?.name)}` : `@ ${abbr(g.opponent?.name)}`;
       tableHtml += `<tr>
-        <td>${fmtDate(g.date)}</td><td>${g.team?.name||"—"} ${vs}</td>
-        <td class="r">${d(s.atBats)}</td><td class="r">${d(s.runs)}</td><td class="r">${d(s.hits)}</td>
-        <td class="r">${d(s.doubles)}</td><td class="r">${d(s.triples)}</td><td class="r">${d(s.homeRuns)}</td>
+        <td>${fmtDate(g.date)}</td><td>${vs}</td>
+        <td class="r">${d(s.atBats)}</td><td class="r">${d(s.hits)}</td>
+        <td class="r">${d(s.homeRuns)}</td>
         <td class="r">${d(s.rbi)}</td><td class="r">${d(s.baseOnBalls)}</td>
-        <td class="r">${d(s.strikeOuts)}</td><td class="r">${d(s.stolenBases)}</td>
       </tr>`;
     }
     tableHtml += "</tbody></table>";
   } else {
     tableHtml = `<table><thead><tr>
-      <th>Date</th><th>Game</th>
-      <th class="r">IP</th><th class="r">H</th><th class="r">R</th><th class="r">ER</th>
-      <th class="r">BB</th><th class="r">K</th><th class="r">HR</th><th class="r">ERA</th>
+      <th>Date</th><th>Opp</th>
+      <th class="r">IP</th><th class="r">ER</th>
+      <th class="r">SO</th><th class="r">BB</th>
     </tr></thead><tbody>`;
     for (const g of games) {
       const s  = g.stat;
-      const vs = g.isHome ? `vs ${g.opponent?.name||"—"}` : `@ ${g.opponent?.name||"—"}`;
+      const vs = g.isHome ? `vs ${abbr(g.opponent?.name)}` : `@ ${abbr(g.opponent?.name)}`;
       tableHtml += `<tr>
-        <td>${fmtDate(g.date)}</td><td>${g.team?.name||"—"} ${vs}</td>
-        <td class="r">${d(s.inningsPitched)}</td><td class="r">${d(s.hits)}</td>
-        <td class="r">${d(s.runs)}</td><td class="r">${d(s.earnedRuns)}</td>
-        <td class="r">${d(s.baseOnBalls)}</td><td class="r">${d(s.strikeOuts)}</td>
-        <td class="r">${d(s.homeRuns)}</td><td class="r">${d(s.era)}</td>
+        <td>${fmtDate(g.date)}</td><td>${vs}</td>
+        <td class="r">${d(s.inningsPitched)}</td><td class="r">${d(s.earnedRuns)}</td>
+        <td class="r">${d(s.strikeOuts)}</td><td class="r">${d(s.baseOnBalls)}</td>
       </tr>`;
     }
     tableHtml += "</tbody></table>";
@@ -419,7 +542,7 @@ function renderGameLog(games, type, logEl, snapshotHtml) {
     <div class="gl-header">
       <span class="gl-title">Last 5 Games</span>
       ${pUrl ? `<a class="gl-link" href="${pUrl}" target="_blank">Player Profile →</a>` : ""}
-    </div>${tableHtml}`;
+    </div><div class="game-log-table-wrap">${tableHtml}</div>`;
 }
 
 // ── TOGGLE CARD ───────────────────────────────────────────────────────────────
@@ -444,6 +567,45 @@ async function toggleCard(cardId, playerId, type, level, team, pos, leagueLabel,
       <div class="snapshot-row"><span class="snapshot-key">Level</span><span class="snapshot-val">${leagueLabel}</span></div>
       <div class="snapshot-row"><span class="snapshot-key">Position</span><span class="snapshot-val">${pos}</span></div>
     </div>`;
+
+  // Manual leagues — show note with link to official site
+  if (level === "KBO") {
+    const kboP = KBO_PLAYERS.find(p => p.name === decodeURIComponent(team||""));
+    const kboPurl = kboP ? kboP.profileUrl : pUrl;
+    const kboNote = kboP?.kboNote || null;
+    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>
+      <div class="gl-header"><span class="gl-title">KBO League — 2026 Season</span>
+      ${kboPurl ? `<a class="gl-link" href="${kboPurl}" target="_blank">View on official KBO site →</a>` : ""}</div>
+      <div class="gl-loading" style="color:#555;text-align:left;padding:1rem 1.25rem;font-size:13px;">
+        ${kboNote ? `<strong>${kboNote}</strong><br><br>` : ""}
+        Stats last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="${kboPurl||'https://eng.koreabaseball.com'}" target="_blank" style="color:#0a2342;font-weight:700;">visit the official KBO player page →</a>
+      </div>`;
+    return;
+  }
+  if (level === "NPB") {
+    const npbP = JAPAN_PLAYERS.find(p => p.name === decodeURIComponent(team||""));
+    const npbPurl = npbP ? npbP.profileUrl : pUrl;
+    const npbNote = npbP?.npbNote || null;
+    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>
+      <div class="gl-header"><span class="gl-title">NPB Japan — 2026 Season</span>
+      ${npbPurl ? `<a class="gl-link" href="${npbPurl}" target="_blank">View on NPB.jp →</a>` : ""}</div>
+      <div class="gl-loading" style="color:#555;text-align:left;padding:1rem 1.25rem;font-size:13px;">
+        ${npbNote ? `<strong>${npbNote}</strong><br><br>` : ""}
+        Stats last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="https://npb.jp/bis/eng/2026/stats/" target="_blank" style="color:#0a2342;font-weight:700;">visit NPB.jp →</a>
+      </div>`;
+    return;
+  }
+  if (level === "FL") {
+    const flP = FL_PLAYERS.find(p => p.name === decodeURIComponent(team||""));
+    const flPurl = flP ? flP.profileUrl : pUrl;
+    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>
+      <div class="gl-header"><span class="gl-title">Frontier League — 2026 Season</span>
+      ${flPurl ? `<a class="gl-link" href="${flPurl}" target="_blank">View on iScore Central →</a>` : ""}</div>
+      <div class="gl-loading" style="color:#555;text-align:left;padding:1rem 1.25rem;font-size:13px;">
+        Stats last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="${flPurl||'https://pro.iscorecentral.com/FL/stats'}" target="_blank" style="color:#0a2342;font-weight:700;">visit iScore Central →</a>
+      </div>`;
+    return;
+  }
 
   if (!playerId || playerId === "null") {
     logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div><div class="gl-loading">No game log available</div>`;
@@ -533,6 +695,16 @@ async function fetchTodaysHighlights(players) {
   document.getElementById("highlights-container").innerHTML = html;
 }
 
+// ── TAB SWITCH ───────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach((t,i) => {
+    const names = ["active","kbo","japan","fl"];
+    t.classList.toggle("active", names[i]===name);
+  });
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById(`panel-${name}`).classList.add("active");
+}
+
 // ── MAIN LOAD ─────────────────────────────────────────────────────────────────
 
 async function loadAll() {
@@ -588,6 +760,50 @@ async function loadAll() {
     ? `<span class="live-dot"></span>${liveCount} with live stats · ${time}`
     : `<span class="err-dot"></span>No stats returned · ${time}`;
   btn.disabled = false;
+
+  // ── KBO TAB ──
+  const manualNotice = (league, link) => `<div style="background:#fff8e1;border-left:4px solid #e8a020;padding:10px 16px;margin:1.25rem 0 0.5rem;border-radius:0 8px 8px 0;font-size:12px;color:#555;line-height:1.6;">
+    <strong style="color:#1a1a2e;">⚠️ Manually updated stats</strong> — ${league} stats are updated manually. Last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="${link}" target="_blank" style="color:#0a2342;font-weight:700;">visit the official site →</a>
+  </div>`;
+
+  let kboHtml = manualNotice("KBO", "https://eng.koreabaseball.com");
+  kboHtml += `<div class="level-section"><div class="level-heading"><span class="level-pill lv-kbo">KBO League — Korea</span><div class="level-line"></div><span class="level-count">${KBO_PLAYERS.length} players</span></div>`;
+  KBO_PLAYERS.forEach((p, i) => {
+    kboHtml += buildCard(p, "KBO", p.team, null, null, cardIdx++, "KBO League", p.kboStats);
+  });
+  kboHtml += "</div>";
+  document.getElementById("kbo-list").innerHTML = kboHtml;
+
+  // ── FL TAB ──
+  let flHtml = manualNotice("Frontier League", "https://pro.iscorecentral.com/FL/stats");
+  flHtml += `<div class="level-section"><div class="level-heading"><span class="level-pill lv-fl">Frontier League</span><div class="level-line"></div><span class="level-count">${FL_PLAYERS.length} players</span></div>`;
+  FL_PLAYERS.forEach((p, i) => {
+    flHtml += buildCard(p, "FL", p.team, null, null, cardIdx++, "Frontier League", p.flStats);
+  });
+  flHtml += "</div>";
+  document.getElementById("fl-list").innerHTML = flHtml;
+
+  // ── JAPAN TAB ──
+  let japanHtml = `<div style="background:#fff8e1;border-left:4px solid #e8a020;padding:10px 16px;margin:1.25rem 0 0.5rem;border-radius:0 8px 8px 0;font-size:12px;color:#555;line-height:1.6;">
+    <strong style="color:#1a1a2e;">⚠️ Manually updated stats</strong> — NPB stats are updated manually. Last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="https://npb.jp/bis/eng/2026/stats/" target="_blank" style="color:#0a2342;font-weight:700;">visit NPB.jp →</a>
+  </div>`;
+
+  // Group by team
+  const japanByTeam = {};
+  JAPAN_PLAYERS.forEach(p => {
+    if (!japanByTeam[p.team]) japanByTeam[p.team] = [];
+    japanByTeam[p.team].push(p);
+  });
+
+  for (const [team, players] of Object.entries(japanByTeam)) {
+    const teamLogo = players[0].teamLogoUrl ? `<img src="${players[0].teamLogoUrl}" style="height:28px;vertical-align:middle;margin-right:8px;">` : "";
+    japanHtml += `<div class="level-section"><div class="level-heading"><span class="level-pill lv-npb">${teamLogo}${team}</span><div class="level-line"></div><span class="level-count">${players.length} player${players.length!==1?"s":""}</span></div>`;
+    players.forEach(p => {
+      japanHtml += buildCard(p, "NPB", p.team, null, null, cardIdx++, "NPB — Japan", p.npbStats);
+    });
+    japanHtml += "</div>";
+  }
+  document.getElementById("japan-list").innerHTML = japanHtml;
 
   fetchTodaysHighlights(PLAYERS);
 }
