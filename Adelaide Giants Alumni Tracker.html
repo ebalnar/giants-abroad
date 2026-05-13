@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adelaide Giants Alumni Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background:#f0f2f5; color:#1a1a1a; min-height:100vh; padding:0 0 4rem; }
+    .container { max-width:1020px; margin:0 auto; padding:0 1rem; }
+
+    /* TOP BAR */
+    .top-bar { background:#1a1a2e; padding:8px 1.5rem; display:flex; align-items:center; justify-content:space-between; }
+    .top-bar-title { font-size:12px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.1em; text-transform:uppercase; }
+    .top-bar-right { font-size:11px; color:rgba(255,255,255,0.45); }
+
+    /* HEADER */
+    .site-header { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%); padding:2.25rem 1.5rem 0; text-align:center; position:relative; overflow:hidden; }
+    .site-header::before { content:""; position:absolute; top:-40px; right:-40px; width:220px; height:220px; border-radius:50%; background:rgba(227,30,79,0.10); }
+    .site-header::after  { content:""; position:absolute; bottom:-60px; left:-30px; width:180px; height:180px; border-radius:50%; background:rgba(227,30,79,0.07); }
+    .header-inner { position:relative; z-index:1; }
+    .header-eyebrow { font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#e8a020; margin-bottom:8px; }
+    .site-header h1 { font-size:34px; font-weight:900; color:#fff; letter-spacing:-1px; line-height:1; }
+    .site-header h1 span { color:#e8a020; }
+    .site-header .tagline { font-size:13px; color:rgba(255,255,255,0.65); margin-top:10px; line-height:1.65; max-width:600px; margin-left:auto; margin-right:auto; }
+    .header-actions { display:flex; align-items:center; justify-content:center; gap:1rem; margin-top:1.25rem; margin-bottom:1.5rem; }
+    .refresh-btn { font-size:12px; padding:7px 18px; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.1); color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+    .refresh-btn:hover { background:rgba(255,255,255,0.2); }
+    .refresh-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .status-bar { font-size:12px; color:rgba(255,255,255,0.6); display:flex; align-items:center; gap:6px; }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:#1D9E75; display:inline-block; }
+    .err-dot  { width:7px; height:7px; border-radius:50%; background:#E24B4A; display:inline-block; }
+
+    /* TABS */
+    .tabs { display:flex; gap:0; border-bottom:2px solid #e0e0e0; background:#fff; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow-x:auto; }
+    .tab { padding:13px 22px; font-size:12px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:#888; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:color 0.15s,border-color 0.15s; white-space:nowrap; }
+    .tab:hover { color:#1a1a2e; }
+    .tab.active { color:#1a1a2e; border-bottom-color:#e8a020; }
+
+    /* PANELS */
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* LEVEL SECTION */
+    .level-section { margin-top:1.75rem; }
+    .level-heading { display:flex; align-items:center; gap:12px; margin-bottom:0.75rem; }
+    .level-pill { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:#fff; padding:4px 14px; border-radius:20px; white-space:nowrap; }
+    .lv-mlb { background:#c8102e; }
+    .lv-aaa { background:#3C3489; }
+    .lv-aa  { background:#0C447C; }
+    .lv-aplus { background:#27500A; }
+    .lv-a   { background:#633806; }
+    .lv-rk  { background:#444441; }
+    .lv-inactive { background:#aaa; }
+    .level-line { flex:1; height:1px; background:#ddd; }
+    .level-count { font-size:11px; color:#bbb; font-weight:600; white-space:nowrap; }
+
+    /* CARD */
+    .player-card { background:#fff; border-radius:12px; border:1px solid #e4e6ea; margin-bottom:8px; overflow:hidden; transition:box-shadow 0.15s; }
+    .player-card:hover { box-shadow:0 2px 16px rgba(0,0,0,0.08); }
+    .player-card.no-stats { opacity:0.6; }
+    .card-header { padding:1rem 1.25rem; display:grid; grid-template-columns:68px 1fr auto; align-items:center; gap:1rem; cursor:pointer; user-select:none; }
+    .card-header:hover { background:#fafbfc; }
+
+    .player-photo { width:60px; height:60px; border-radius:50%; object-fit:cover; object-position:top center; background:#e8eaf0; border:2px solid #e4e6ea; display:block; }
+    .photo-placeholder { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#1a1a2e,#0f3460); border:2px solid #e4e6ea; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; font-weight:700; }
+
+    .player-name { font-size:16px; font-weight:700; color:#1a1a2e; }
+    .player-meta { font-size:12px; color:#888; margin:3px 0 7px; }
+    .player-meta strong { color:#555; }
+    .badges { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+    .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; }
+    .badge-giants { background:#fff3cd; color:#856404; }
+    .b-mlb   { background:#FCEBEB; color:#791F1F; }
+    .b-aaa   { background:#EEEDFE; color:#3C3489; }
+    .b-aa    { background:#E6F1FB; color:#0C447C; }
+    .b-aplus { background:#EAF3DE; color:#27500A; }
+    .b-a     { background:#FAEEDA; color:#633806; }
+    .b-rk    { background:#F1EFE8; color:#444441; }
+
+    .profile-btn { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; padding:3px 10px; border-radius:20px; border:1px solid #1a1a2e; color:#1a1a2e; background:transparent; text-decoration:none; cursor:pointer; transition:background 0.15s,color 0.15s; }
+    .profile-btn:hover { background:#1a1a2e; color:#fff; }
+
+    .card-right { display:flex; align-items:center; gap:1.5rem; }
+    .player-team { display:flex; align-items:center; gap:10px; min-width:170px; }
+    .team-logo { width:38px; height:38px; object-fit:contain; }
+    .team-ball { width:38px; height:38px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .team-name { font-size:13px; font-weight:600; color:#1a1a1a; }
+    .team-sub  { font-size:11px; color:#aaa; margin-top:2px; }
+    .divider-v { width:1px; height:42px; background:#eee; flex-shrink:0; }
+    .player-stats { display:flex; gap:1.25rem; text-align:center; }
+    .stat-value { font-size:20px; font-weight:700; color:#1a1a2e; line-height:1; }
+    .stat-label { font-size:10px; color:#aaa; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:3px; }
+    .expand-arrow { font-size:14px; color:#bbb; margin-left:0.5rem; transition:transform 0.2s; display:inline-block; flex-shrink:0; }
+    .expand-arrow.open { transform:rotate(180deg); }
+
+    /* GAME LOG */
+    .game-log { display:none; border-top:1px solid #f0f2f5; }
+    .game-log.open { display:block; }
+    .gl-header { background:#1a1a2e; color:#fff; padding:10px 1.25rem; display:flex; align-items:center; justify-content:space-between; }
+    .gl-title { font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
+    .gl-loading { padding:1.5rem; text-align:center; color:#aaa; font-size:13px; }
+    .gl-link { font-size:11px; color:#7dd3fc; text-decoration:none; font-weight:600; }
+    .gl-link:hover { text-decoration:underline; }
+    .game-log table { width:100%; border-collapse:collapse; font-size:12px; }
+    .game-log thead tr { background:#f9f8f4; }
+    .game-log th { padding:7px 10px; text-align:left; font-weight:700; font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.06em; border-bottom:1px solid #eee; white-space:nowrap; }
+    .game-log th.r { text-align:right; }
+    .game-log td { padding:7px 10px; border-bottom:1px solid #f5f5f5; color:#333; white-space:nowrap; }
+    .game-log td.r { text-align:right; color:#555; font-variant-numeric:tabular-nums; }
+    .game-log tr:last-child td { border-bottom:none; }
+    .snapshot { padding:1rem 1.25rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem; border-bottom:1px solid #f0f2f5; }
+    .snapshot-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#999; margin-bottom:8px; }
+    .snapshot-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #f9f9f9; font-size:12.5px; }
+    .snapshot-row:last-child { border-bottom:none; }
+    .snapshot-key { color:#999; }
+    .snapshot-val { font-weight:600; color:#1a1a1a; }
+
+    .site-footer { text-align:center; margin-top:3rem; padding:1.5rem; border-top:1px solid #ddd; font-size:11px; color:#bbb; line-height:1.8; }
+
+    @media (max-width:700px) {
+      .card-right { display:none; }
+      .card-header { grid-template-columns:56px 1fr; }
+      .site-header h1 { font-size:26px; }
+      .tab { padding:11px 14px; font-size:11px; }
+    }
+
+    /* HIGHLIGHTS */
+    .highlights-section { margin-top:1.5rem; margin-bottom:0.5rem; }
+    .highlights-header { display:flex; align-items:center; gap:12px; margin-bottom:0.75rem; }
+    .highlights-title { font-size:13px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#1a1a2e; }
+    .highlights-date { font-size:11px; color:#aaa; font-weight:600; }
+    .highlights-line { flex:1; height:1px; background:#ddd; }
+    .highlights-list { list-style:none; padding:0; margin:0 0 1rem; }
+    .highlights-list li { font-size:13px; color:#333; line-height:1.7; padding:3px 0; border-bottom:1px solid #f5f5f5; }
+    .highlights-list li:last-child { border-bottom:none; }
+    .highlights-list li::before { content:"·"; color:#e8a020; font-weight:900; margin-right:8px; }
+    .hl-name { font-weight:700; color:#1a1a2e; }
+    .hl-stats { color:#555; }
+    .highlights-loading { padding:0.75rem 0; font-size:13px; color:#aaa; }
+    .highlights-empty { padding:0.75rem 0; font-size:13px; color:#aaa; font-style:italic; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-title">⚾ Adelaide Giants Alumni</div>
+  <div class="top-bar-right">adelaidegiantsbaseball.com</div>
+</div>
+
+<div class="site-header">
+  <div class="header-inner">
+    <div class="header-eyebrow">🏆 Adelaide Giants Baseball</div>
+    <h1>Alumni <span>Pro</span> Tracker</h1>
+    <div class="tagline">
+      Tracking how Adelaide Giants alumni are performing in the Major and Minor Leagues.
+    </div>
+    <div class="header-actions">
+      <button class="refresh-btn" id="refresh-btn" onclick="loadAll()">↻ Refresh stats</button>
+      <div class="status-bar" id="status">Loading…</div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="container">
+  <!-- NOTICE -->
+  <div style="background:#fff;border-left:4px solid #e8a020;padding:10px 16px;margin-top:1.25rem;border-radius:0 8px 8px 0;font-size:12px;color:#555;line-height:1.6;">
+    <strong style="color:#1a1a2e;">Note:</strong> This tracker only includes players who currently hold an active MLB or MLB-affiliate contract.
+  </div>
+
+  <!-- HIGHLIGHTS -->
+  <div class="highlights-section" id="highlights-section">
+    <div class="highlights-header">
+      <span class="highlights-title">⚡ Today's Highlights</span>
+      <span class="highlights-date" id="highlights-date"></span>
+      <div class="highlights-line"></div>
+    </div>
+    <div id="highlights-container"><div class="highlights-loading">Fetching game logs…</div></div>
+  </div>
+
+  <div id="active-list"></div>
+
+  <div class="site-footer">
+    Adelaide Giants Alumni Tracker &nbsp;|&nbsp; Stats via MLB Stats API &nbsp;|&nbsp; Photos via MLB.com
+  </div>
+</div>
+
+<script>
+const PROXY  = "https://aussiesabroad.ericbalnar.workers.dev";
+const SEASON = 2026;
+const MILB_IDS = [11,12,13,14,16];
+
+function teamLogoUrl(id) { return id ? `https://www.mlbstatic.com/team-logos/${id}.svg` : null; }
+function photoUrl(id)    { return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${id}/headshot/67/current`; }
+function photoUrlMilb(id) { return `https://img.mlbstatic.com/mlb-photos/image/upload/c_fill,g_auto/w_180/v1/people/${id}/headshot/milb/current`; }
+function initials(n)     { return n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
+function normLevel(a)    { return {AAA:"AAA",AA:"AA","A+":"A+",A:"A",ROK:"Rookie",MLB:"MLB"}[a]||"—"; }
+function d(v)            { return (v==null||v===""||v==="-")?"—":v; }
+function fmtDate(s)      { if(!s) return "—"; return new Date(s).toLocaleDateString("en-AU",{day:"numeric",month:"short"}); }
+
+const LEVEL_ORDER  = ["MLB","AAA","AA","A+","A","Rookie","—"];
+const LEVEL_LABELS = { MLB:"MLB", AAA:"Triple-A (AAA)", AA:"Double-A (AA)", "A+":"High-A", A:"Single-A", Rookie:"Rookie Ball", "—":"Inactive / No Stats" };
+const LEVEL_PILL   = { MLB:"lv-mlb", AAA:"lv-aaa", AA:"lv-aa", "A+":"lv-aplus", A:"lv-a", Rookie:"lv-rk", "—":"lv-inactive" };
+const BADGE_CLS    = { MLB:"b-mlb", AAA:"b-aaa", AA:"b-aa", "A+":"b-aplus", A:"b-a", Rookie:"b-rk" };
+
+function profileUrl(p, level) {
+  if (p.profileUrl) return p.profileUrl;
+  if (!p.id) return null;
+  const slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+  return level==="MLB"
+    ? `https://www.mlb.com/player/${slug}-${p.id}`
+    : `https://www.milb.com/player/${slug}-${p.id}`;
+}
+
+// ── PLAYER DATA ───────────────────────────────────────────────────────────────
+// giantsYears: years played for Adelaide Giants (shown as "Last played: YYYY" or "YYYY–YYYY")
+
+const PLAYERS = [
+  // MLB
+  { id:678554, name:"Curtis Mead",       pos:"1B/3B", type:"hitter",  giantsYears:"2022", sportIds:[1,...MILB_IDS] },
+  { id:681351, name:"Logan O'Hoppe",     pos:"C",     type:"hitter",  giantsYears:"2020", sportIds:[1,...MILB_IDS] },
+  { id:663897, name:"Luke Williams",     pos:"IF/OF", type:"hitter",  giantsYears:"2021", sportIds:[1,...MILB_IDS] },
+
+  // Active MiLB - 2026 Giants
+  { id:683569, name:"Jose Colmenares",   pos:"SS",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
+  { id:806730, name:"Drew Davies",       pos:"OF",    type:"hitter",  giantsYears:"2024–2026", sportIds:MILB_IDS },
+  { id:808232, name:"Alirio Ferrebus",   pos:"C/1B",  type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
+  { id:699712, name:"Raylin Heredia",    pos:"OF",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
+  { id:800272, name:"Manolfi Jimenez",   pos:"OF",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
+  { id:699707, name:"Danyony Pulido",    pos:"RHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
+  { id:701320, name:"Camron Hill",       pos:"LHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
+  { id:681973, name:"Josh Hendrickson",  pos:"LHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
+  { id:816305, name:"Alistair Tanner",   pos:"P",     type:"pitcher", giantsYears:"2024–2026", sportIds:MILB_IDS },
+
+  // Active MiLB - 2025 Giants
+  { id:691276, name:"Luis Caicuto",      pos:"C",     type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:800444, name:"Nikau Pouaka-Grego",pos:"IF",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:802531, name:"Trent Farquhar",    pos:"IF",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:693732, name:"Estibenzon Jimenez",pos:"RHP",   type:"pitcher", giantsYears:"2025", sportIds:MILB_IDS },
+  { id:678620, name:"Blake Townsend",    pos:"LHP",   type:"pitcher", giantsYears:"2025", sportIds:MILB_IDS },
+  { id:666748, name:"Mitch Neunborn",    pos:"RHP",   type:"pitcher", giantsYears:"2022–2024", sportIds:MILB_IDS },
+  { id:681495, name:"Cade Fergus",       pos:"OF",    type:"hitter",  giantsYears:"2024", sportIds:MILB_IDS },
+  { id:805634, name:"Braeden Fausnaught",pos:"LHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+
+  // Alumni - older / released
+  { id:688011, name:"Cam Wynne",         pos:"RHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+  { id:679972, name:"Arturo De Freitas", pos:"C",     type:"hitter",  giantsYears:"2023", sportIds:MILB_IDS },
+  { id:800550, name:"Miguel Cienfuegos", pos:"RHP",   type:"pitcher", giantsYears:"2023", sportIds:MILB_IDS },
+];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+
+function hStatsHtml(s) {
+  if (!s) return "";
+  return `<div class="player-stats">
+    <div><div class="stat-value">${d(s.avg)}</div><div class="stat-label">AVG</div></div>
+    <div><div class="stat-value">${d(s.homeRuns)}</div><div class="stat-label">HR</div></div>
+    <div><div class="stat-value">${d(s.rbi)}</div><div class="stat-label">RBI</div></div>
+    <div><div class="stat-value">${d(s.ops)}</div><div class="stat-label">OPS</div></div>
+  </div>`;
+}
+function pStatsHtml(s) {
+  if (!s) return "";
+  return `<div class="player-stats">
+    <div><div class="stat-value">${d(s.era)}</div><div class="stat-label">ERA</div></div>
+    <div><div class="stat-value">${d(s.inningsPitched)}</div><div class="stat-label">IP</div></div>
+    <div><div class="stat-value">${d(s.strikeOuts)}</div><div class="stat-label">K</div></div>
+    <div><div class="stat-value">${d(s.whip)}</div><div class="stat-label">WHIP</div></div>
+  </div>`;
+}
+
+function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel) {
+  const hasStats = !!seasonStats;
+  const statsHtml = p.type==="hitter" ? hStatsHtml(seasonStats) : pStatsHtml(seasonStats);
+  const logo = teamId
+    ? `<img class="team-logo" src="${teamLogoUrl(teamId)}" alt="" onerror="this.style.display='none'">`
+    : `<div class="team-ball">⚾</div>`;
+  const photo = p.id
+    ? `<img class="player-photo" src="${photoUrl(p.id)}" alt="${p.name}" onerror="this.src='${photoUrlMilb(p.id)}'; this.onerror=function(){this.outerHTML='<div class=\\'photo-placeholder\\'>${initials(p.name)}</div>'}">`
+    : `<div class="photo-placeholder">${initials(p.name)}</div>`;
+
+  const pUrl = profileUrl(p, level);
+  const profileBtn = pUrl
+    ? `<a class="profile-btn" href="${pUrl}" target="_blank" onclick="event.stopPropagation()">↗ Profile</a>`
+    : "";
+
+  const badgeCls = BADGE_CLS[level] || "b-rk";
+
+  // Giants years badge
+  const yearsLabel = p.giantsYears.includes("–") ? p.giantsYears : `Last played: ${p.giantsYears}`;
+  const giantsBadge = `<span class="badge badge-giants">⚾ Giants ${yearsLabel}</span>`;
+
+  const escapedName = p.name.replace(/'/g,"\\'");
+  const escapedTeam = team.replace(/'/g,"\\'");
+
+  return `
+  <div class="player-card ${!hasStats?"no-stats":""}" id="card-${cardId}">
+    <div class="card-header" onclick="toggleCard('${cardId}',${p.id||"null"},'${p.type}','${level}','${escapedTeam}','${p.pos}','${leagueLabel}','${pUrl||""}')">
+      <div>${photo}</div>
+      <div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-meta"><strong>${p.pos}</strong></div>
+        <div class="badges">
+          <span class="badge ${badgeCls}">${level}</span>
+          ${giantsBadge}
+          ${profileBtn}
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="player-team">
+          ${logo}
+          <div>
+            <div class="team-name">${team}</div>
+            <div class="team-sub">${leagueLabel}</div>
+          </div>
+        </div>
+        ${statsHtml ? `<div class="divider-v"></div>${statsHtml}` : ""}
+        <div class="expand-arrow" id="arrow-${cardId}">▼</div>
+      </div>
+    </div>
+    <div class="game-log" id="log-${cardId}" data-level="${level}" data-purl="${pUrl||""}"></div>
+  </div>`;
+}
+
+// ── API FETCH ─────────────────────────────────────────────────────────────────
+
+const LEVEL_PRIORITY = { MLB:0, AAA:1, AA:2, "A+":3, A:4, Rookie:5, "—":6 };
+
+async function fetchStats(player) {
+  const group = player.type==="hitter"?"hitting":"pitching";
+  const results = await Promise.all(player.sportIds.map(async sportId => {
+    const url = `${PROXY}/api/api/v1/people/${player.id}/stats?stats=season&season=${SEASON}&sportId=${sportId}&group=${group}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const splits = data.stats?.[0]?.splits;
+      if (!splits||!splits.length) return null;
+      let best = splits[0];
+      for (const s of splits) if ((s.stat?.gamesPlayed||0)>(best.stat?.gamesPlayed||0)) best=s;
+      return { stats:best.stat, team:best.team?.name||"—", teamId:best.team?.id||null, level:normLevel(best.sport?.abbreviation||"—") };
+    } catch(e) { return null; }
+  }));
+  const valid = results.filter(r => r !== null);
+  if (!valid.length) return null;
+  return valid.sort((a,b) => (LEVEL_PRIORITY[a.level]??6) - (LEVEL_PRIORITY[b.level]??6))[0];
+}
+
+async function fetchGameLog(playerId, type, sportIds) {
+  const group = type==="hitter"?"hitting":"pitching";
+  for (const sportId of sportIds) {
+    const url = `${PROXY}/api/api/v1/people/${playerId}/stats?stats=gameLog&season=${SEASON}&sportId=${sportId}&group=${group}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const splits = data.stats?.[0]?.splits;
+      if (!splits||!splits.length) continue;
+      return splits.slice(-5).reverse();
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+// ── GAME LOG RENDER ───────────────────────────────────────────────────────────
+
+function renderGameLog(games, type, logEl, snapshotHtml) {
+  const pUrl = logEl.dataset.purl;
+  const level = logEl.dataset.level;
+  const leagueLabel = logEl.dataset.level;
+
+  if (!games||!games.length) {
+    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div><div class="gl-loading">No recent game log available yet this season</div>`;
+    return;
+  }
+
+  let tableHtml = "";
+  if (type === "hitter") {
+    tableHtml = `<table><thead><tr>
+      <th>Date</th><th>Game</th>
+      <th class="r">AB</th><th class="r">R</th><th class="r">H</th>
+      <th class="r">2B</th><th class="r">3B</th><th class="r">HR</th>
+      <th class="r">RBI</th><th class="r">BB</th><th class="r">K</th><th class="r">SB</th>
+    </tr></thead><tbody>`;
+    for (const g of games) {
+      const s  = g.stat;
+      const vs = g.isHome ? `vs ${g.opponent?.name||"—"}` : `@ ${g.opponent?.name||"—"}`;
+      tableHtml += `<tr>
+        <td>${fmtDate(g.date)}</td><td>${g.team?.name||"—"} ${vs}</td>
+        <td class="r">${d(s.atBats)}</td><td class="r">${d(s.runs)}</td><td class="r">${d(s.hits)}</td>
+        <td class="r">${d(s.doubles)}</td><td class="r">${d(s.triples)}</td><td class="r">${d(s.homeRuns)}</td>
+        <td class="r">${d(s.rbi)}</td><td class="r">${d(s.baseOnBalls)}</td>
+        <td class="r">${d(s.strikeOuts)}</td><td class="r">${d(s.stolenBases)}</td>
+      </tr>`;
+    }
+    tableHtml += "</tbody></table>";
+  } else {
+    tableHtml = `<table><thead><tr>
+      <th>Date</th><th>Game</th>
+      <th class="r">IP</th><th class="r">H</th><th class="r">R</th><th class="r">ER</th>
+      <th class="r">BB</th><th class="r">K</th><th class="r">HR</th><th class="r">ERA</th>
+    </tr></thead><tbody>`;
+    for (const g of games) {
+      const s  = g.stat;
+      const vs = g.isHome ? `vs ${g.opponent?.name||"—"}` : `@ ${g.opponent?.name||"—"}`;
+      tableHtml += `<tr>
+        <td>${fmtDate(g.date)}</td><td>${g.team?.name||"—"} ${vs}</td>
+        <td class="r">${d(s.inningsPitched)}</td><td class="r">${d(s.hits)}</td>
+        <td class="r">${d(s.runs)}</td><td class="r">${d(s.earnedRuns)}</td>
+        <td class="r">${d(s.baseOnBalls)}</td><td class="r">${d(s.strikeOuts)}</td>
+        <td class="r">${d(s.homeRuns)}</td><td class="r">${d(s.era)}</td>
+      </tr>`;
+    }
+    tableHtml += "</tbody></table>";
+  }
+  logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>
+    <div class="gl-header">
+      <span class="gl-title">Last 5 Games</span>
+      ${pUrl ? `<a class="gl-link" href="${pUrl}" target="_blank">Player Profile →</a>` : ""}
+    </div>${tableHtml}`;
+}
+
+// ── TOGGLE CARD ───────────────────────────────────────────────────────────────
+
+const openLogs = {};
+
+async function toggleCard(cardId, playerId, type, level, team, pos, leagueLabel, pUrl) {
+  const logEl = document.getElementById(`log-${cardId}`);
+  const arrow  = document.getElementById(`arrow-${cardId}`);
+  const isOpen = logEl.classList.contains("open");
+  if (isOpen) { logEl.classList.remove("open"); arrow.classList.remove("open"); return; }
+  logEl.classList.add("open");
+  arrow.classList.add("open");
+  if (openLogs[cardId]) return;
+  openLogs[cardId] = true;
+  logEl.innerHTML = "<div class=\"gl-loading\">Loading…</div>";
+
+  const snapshotHtml = `
+    <div>
+      <div class="snapshot-title">Player Snapshot</div>
+      <div class="snapshot-row"><span class="snapshot-key">Current team</span><span class="snapshot-val">${team}</span></div>
+      <div class="snapshot-row"><span class="snapshot-key">Level</span><span class="snapshot-val">${leagueLabel}</span></div>
+      <div class="snapshot-row"><span class="snapshot-key">Position</span><span class="snapshot-val">${pos}</span></div>
+    </div>`;
+
+  if (!playerId || playerId === "null") {
+    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div><div class="gl-loading">No game log available</div>`;
+    return;
+  }
+  const p = PLAYERS.find(p => p.id === parseInt(playerId));
+  const sportIds = p ? p.sportIds : MILB_IDS;
+  const games = await fetchGameLog(parseInt(playerId), type, sportIds);
+  renderGameLog(games, type, logEl, snapshotHtml);
+}
+
+
+// ── TODAY'S HIGHLIGHTS ────────────────────────────────────────────────────────
+
+async function fetchTodaysHighlights(players) {
+  const today = new Date().toLocaleDateString("en-AU", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+  document.getElementById("highlights-date").textContent = today;
+
+  const logs = await Promise.all(players.map(async p => {
+    const group = p.type === "hitter" ? "hitting" : "pitching";
+    for (const sportId of p.sportIds) {
+      const url = `${PROXY}/api/api/v1/people/${p.id}/stats?stats=gameLog&season=${SEASON}&sportId=${sportId}&group=${group}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const data = await res.json();
+        const splits = data.stats?.[0]?.splits;
+        if (!splits || !splits.length) continue;
+        const last = splits[splits.length - 1];
+        return { player: p, game: last, level: normLevel(last.sport?.abbreviation || "—") };
+      } catch(e) { continue; }
+    }
+    return null;
+  }));
+
+  const now = new Date();
+  const highlights = logs
+    .filter(l => l && l.game && l.game.stat)
+    .filter(l => {
+      if (!l.game.date) return false;
+      const gd = new Date(l.game.date);
+      const diffDays = Math.floor((now - gd) / (1000 * 60 * 60 * 24));
+      return diffDays <= 1;
+    });
+
+  if (!highlights.length) {
+    document.getElementById("highlights-container").innerHTML =
+      `<div class="highlights-empty">No game log data found for the most recent date yet — check back after games conclude.</div>`;
+    return;
+  }
+
+  highlights.sort((a,b) => (LEVEL_PRIORITY[a.level]??6) - (LEVEL_PRIORITY[b.level]??6));
+
+  let html = '<ul class="highlights-list">';
+  for (const { player: p, game: g, level } of highlights) {
+    const s = g.stat;
+    const opponent = g.opponent?.name || "—";
+    const vsStr = g.isHome ? `vs ${opponent}` : `@ ${opponent}`;
+    const teamName = g.team?.name || "—";
+    const verb = p.type === "pitcher" ? "pitched" : "played";
+
+    let statParts = [];
+    if (p.type === "hitter") {
+      const h = parseInt(s.hits)||0, ab = parseInt(s.atBats)||0;
+      statParts.push(`${h}/${ab} H/AB`);
+      const hr = parseInt(s.homeRuns)||0, rbi = parseInt(s.rbi)||0, bb = parseInt(s.baseOnBalls)||0, k = parseInt(s.strikeOuts)||0, sb = parseInt(s.stolenBases)||0, r = parseInt(s.runs)||0;
+      if (hr > 0) statParts.push(`${hr} HR`);
+      if (rbi > 0) statParts.push(`${rbi} RBI`);
+      if (r > 0) statParts.push(`${r} R`);
+      if (bb > 0) statParts.push(`${bb} BB`);
+      if (k > 0) statParts.push(`${k} K`);
+      if (sb > 0) statParts.push(`${sb} SB`);
+    } else {
+      const ip = s.inningsPitched || "0";
+      statParts.push(`${ip} IP`);
+      const k = parseInt(s.strikeOuts)||0, er = parseInt(s.earnedRuns)||0, bb = parseInt(s.baseOnBalls)||0, h = parseInt(s.hits)||0, hr = parseInt(s.homeRuns)||0;
+      if (k > 0) statParts.push(`${k} K`);
+      statParts.push(`${er} ER`);
+      if (bb > 0) statParts.push(`${bb} BB`);
+      if (h > 0) statParts.push(`${h} H`);
+      if (hr > 0) statParts.push(`${hr} HR`);
+    }
+    const statLine = statParts.join(", ");
+    html += `<li><span class="hl-name">${p.name}</span> ${verb} for ${teamName} (${level}) ${vsStr}: <span class="hl-stats">${statLine}</span></li>`;
+  }
+  html += '</ul>';
+  document.getElementById("highlights-container").innerHTML = html;
+}
+
+// ── MAIN LOAD ─────────────────────────────────────────────────────────────────
+
+async function loadAll() {
+  const btn = document.getElementById("refresh-btn");
+  btn.disabled = true;
+  document.getElementById("status").textContent = "Fetching live stats…";
+
+  const results = await Promise.all(PLAYERS.map(p => fetchStats(p)));
+  const enriched = PLAYERS.map((p,i) => ({
+    ...p,
+    finalLevel:  results[i]?.level  || "—",
+    finalTeam:   results[i]?.team   || "—",
+    finalTeamId: results[i]?.teamId || null,
+    finalStats:  results[i]?.stats  || null,
+    leagueLabel: results[i]?.level  || "—",
+  }));
+
+  function sortedGroup(players) {
+    return [...players].sort((a,b) => {
+      const aS = a.finalStats, bS = b.finalStats;
+      if (!aS&&!bS) return 0;
+      if (!aS) return 1;
+      if (!bS) return -1;
+      if (a.type==="hitter"&&b.type==="hitter") return (parseFloat(bS.avg)||0)-(parseFloat(aS.avg)||0);
+      if (a.type==="pitcher"&&b.type==="pitcher") return (parseFloat(aS.era)||99)-(parseFloat(bS.era)||99);
+      return 0;
+    });
+  }
+
+  // ── ACTIVE TAB (players with stats this season) ──
+  const withStats = enriched.filter(p => p.finalStats);
+  const groups = {};
+  ["MLB","AAA","AA","A+","A","Rookie","—"].forEach(lv => groups[lv]=[]);
+  withStats.forEach(p => { const lv=p.finalLevel; (groups[lv]||groups["—"]).push(p); });
+
+  let activeHtml = ""; let cardIdx = 0; let liveCount = 0;
+  for (const lv of ["MLB","AAA","AA","A+","A","Rookie"]) {
+    const grp = sortedGroup(groups[lv]);
+    if (!grp.length) continue;
+    activeHtml += `<div class="level-section"><div class="level-heading"><span class="level-pill ${LEVEL_PILL[lv]}">${LEVEL_LABELS[lv]}</span><div class="level-line"></div><span class="level-count">${grp.length} player${grp.length!==1?"s":""}</span></div>`;
+    for (const p of grp) {
+      liveCount++;
+      activeHtml += buildCard(p,p.finalLevel,p.finalTeam,p.finalTeamId,p.finalStats,cardIdx++,p.leagueLabel);
+    }
+    activeHtml += "</div>";
+  }
+  if (!activeHtml) activeHtml = `<p style="padding:2rem;color:#aaa;font-size:13px;">No active stats found yet — check back during the season.</p>`;
+  document.getElementById("active-list").innerHTML = activeHtml;
+
+  const time = new Date().toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"});
+  const statusEl = document.getElementById("status");
+  statusEl.innerHTML = liveCount > 0
+    ? `<span class="live-dot"></span>${liveCount} with live stats · ${time}`
+    : `<span class="err-dot"></span>No stats returned · ${time}`;
+  btn.disabled = false;
+
+  fetchTodaysHighlights(PLAYERS);
+}
+
+loadAll();
+</script>
+</body>
+</html>
