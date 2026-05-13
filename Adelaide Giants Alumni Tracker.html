@@ -178,6 +178,14 @@
     /* Scroll wrap for game log */
     .game-log-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
     .game-log table { min-width:280px; }
+
+    /* Mobile tab dropdown */
+    .tab-dropdown-wrap { display:none; position:sticky; top:0; z-index:100; background:#1a1a2e; border-bottom:3px solid #e8a020; box-shadow:0 3px 12px rgba(0,0,0,0.2); padding:10px 12px; }
+    .tab-dropdown { width:100%; padding:13px 16px; font-size:15px; font-weight:800; letter-spacing:0.03em; border:2px solid #e8a020; border-radius:8px; background:#fff; color:#1a1a2e; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%23e8a020' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    @media (max-width:700px) {
+      .tabs { display:none !important; }
+      .tab-dropdown-wrap { display:block; }
+    }
   </style>
 </head>
 <body>
@@ -189,14 +197,15 @@
 
 <div class="site-header">
   <div class="header-inner">
-    <div class="header-eyebrow">🏆 Adelaide Giants Baseball</div>
     <h1>Alumni <span>Pro</span> Tracker</h1>
     <div class="tagline">
-      Tracking how Adelaide Giants alumni are performing in the Major and Minor Leagues.
+      <span style="background:#e8a020;color:#1a1a2e;font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;">⚠️ Testing Mode</span><br>
+      In real time, this page tracks how Adelaide Giants alumni are performing in MLB, Affiliated, and Professional Baseball.
     </div>
     <div class="header-notice">
-      Please scroll through and click on each player for more detail. This website is best viewed on a desktop.
-      This is just the test before full roll out — send feedback to <a href="mailto:eric.balnar@baseball.com.au">eric.balnar@baseball.com.au</a>
+      Please scroll through and click on each player for further details, links and game logs. This site is best viewed on a desktop.<br><br>
+      This is a trial version. If you're like me, you love Aussie baseball and want an easy way to follow. This could be it.<br>
+      Feedback? Email me or DM me — <a href="mailto:ericbalnar@gmail.com">ericbalnar@gmail.com</a>
     </div>
     <div class="header-actions">
       <button class="refresh-btn" id="refresh-btn" onclick="loadAll()">↻ Refresh stats</button>
@@ -213,6 +222,15 @@
   <div class="tab" onclick="switchTab('japan')">🇯🇵 Japan (NPB)</div>
   <div class="tab" onclick="switchTab('fl')">🌿 Frontier League</div>
 </div>
+<div class="tab-dropdown-wrap">
+  <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:6px;">📋 Select a league</div>
+  <select class="tab-dropdown" onchange="switchTab(this.value)">
+    <option value="active">⚾ MLB / Minor Leagues</option>
+    <option value="kbo">🇰🇷 Korea (KBO)</option>
+    <option value="japan">🇯🇵 Japan (NPB)</option>
+    <option value="fl">🌿 Frontier League</option>
+  </select>
+</div>
 
 <div class="container">
   <!-- TAB PANELS -->
@@ -224,7 +242,7 @@
     <!-- HIGHLIGHTS -->
     <div class="highlights-section" id="highlights-section">
       <div class="highlights-header">
-        <span class="highlights-title">⚡ Today's Highlights</span>
+        <span class="highlights-title">⚡ Today's Giants in Action</span>
         <span class="highlights-date" id="highlights-date"></span>
         <div class="highlights-line"></div>
       </div>
@@ -703,6 +721,8 @@ function switchTab(name) {
   });
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
   document.getElementById(`panel-${name}`).classList.add("active");
+  const dd = document.querySelector(".tab-dropdown");
+  if (dd) dd.value = name;
 }
 
 // ── MAIN LOAD ─────────────────────────────────────────────────────────────────
