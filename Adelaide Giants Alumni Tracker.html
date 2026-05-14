@@ -149,8 +149,10 @@
       .card-header { grid-template-columns:56px 1fr; }
       .site-header h1 { font-size:26px; }
       .tab { padding:11px 14px; font-size:11px; }
-      .mobile-stats { display:flex; gap:1rem; padding:0 1.25rem 0.75rem; flex-wrap:wrap; }
-      .mobile-stat-value { font-size:16px; font-weight:700; color:#1a1a2e; line-height:1; }
+      .mobile-stats { display:flex !important; flex-direction:row; gap:0; padding:6px 1rem 0; border-top:1px solid #eee; margin-top:6px; }
+      .mobile-stats > div { flex:1; text-align:center; padding:3px 4px; border-right:1px solid #e8e8e8; }
+      .mobile-stats > div:last-child { border-right:none; }
+      .mobile-stat-value { font-size:15px; font-weight:800; color:#1a1a2e; line-height:1; display:block; letter-spacing:-0.02em; }
       .mobile-stat-label { font-size:10px; color:#aaa; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:2px; }
       .expand-arrow { font-size:18px; color:#e8a020; font-weight:900; }
     }
@@ -160,8 +162,8 @@
 
     .mobile-tap-hint { display:none; }
     @media (max-width:700px) {
-      .mobile-tap-hint { display:block; font-size:10px; color:#e8a020; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:0 1.25rem 0.85rem; }
-      .player-card.no-stats .mobile-tap-hint { display:none; }
+      .mobile-tap-hint { display:block !important; width:100%; text-align:center; font-size:9px; color:#e8a020; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:4px 0 6px; }
+      .player-card.no-stats .mobile-tap-hint { display:none !important; }
     }
 
     /* TABS */
@@ -186,26 +188,32 @@
       .tabs { display:none !important; }
       .tab-dropdown-wrap { display:block; }
     }
+
+    .tab-dropdown-wrap { display:none; position:sticky; top:0; z-index:200; background:#1a1a2e; border-bottom:3px solid #e8a020; box-shadow:0 3px 12px rgba(0,0,0,0.2); padding:8px 12px; flex-direction:column; align-items:stretch; }
+    .tab-dropdown-label { font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.7); margin-bottom:5px; }
+    .tab-dropdown { width:100%; padding:10px 36px 10px 12px; font-size:14px; font-weight:700; border:2px solid #e8a020; border-radius:8px; background:#fff; color:#1a1a2e; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8a020' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; cursor:pointer; }
+    @media (max-width:700px) {
+      .tabs { display:none !important; }
+      .tab-dropdown-wrap { display:flex !important; }
+    }
   </style>
 </head>
 <body>
 
 <div class="top-bar">
   <div class="top-bar-title">⚾ Adelaide Giants Alumni</div>
-  <div class="top-bar-right">adelaidegiantsbaseball.com</div>
+  <div class="top-bar-right">adelaidegiants.com.au</div>
 </div>
 
 <div class="site-header">
   <div class="header-inner">
-    <h1>Alumni <span>Pro</span> Tracker</h1>
+    <h1>Giants <span>Alumni</span> Tracker</h1>
     <div class="tagline">
-      <span style="background:#e8a020;color:#1a1a2e;font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;">⚠️ Testing Mode</span><br>
-      In real time, this page tracks how Adelaide Giants alumni are performing in MLB, Affiliated, and Professional Baseball.
+      <span style="background:#e8a020;color:#1a1a2e;font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;">⚠️ Draft Only</span><br>
+      This page is used to track Adelaide Giants past and current players in MLB, Affiliated and Professional Baseball.
     </div>
     <div class="header-notice">
-      Please scroll through and click on each player for further details, links and game logs. This site is best viewed on a desktop.<br><br>
-      This is a trial version. If you're like me, you love Aussie baseball and want an easy way to follow. This could be it.<br>
-      Feedback? Email me or DM me — <a href="mailto:ericbalnar@gmail.com">ericbalnar@gmail.com</a>
+      Feedback or missing a player? Email Eric Balnar at <a href="mailto:ericbalnar@gmail.com">ericbalnar@gmail.com</a>
     </div>
     <div class="header-actions">
       <button class="refresh-btn" id="refresh-btn" onclick="loadAll()">↻ Refresh stats</button>
@@ -220,16 +228,23 @@
   <div class="tab active" onclick="switchTab('active')">⚾ MLB / Minor Leagues</div>
   <div class="tab" onclick="switchTab('kbo')">🇰🇷 Korea (KBO)</div>
   <div class="tab" onclick="switchTab('japan')">🇯🇵 Japan (NPB)</div>
-  <div class="tab" onclick="switchTab('fl')">🌿 Frontier League</div>
+  <div class="tab" onclick="switchTab('fl')">⚾ Independent Leagues</div>
+  <div class="tab" onclick="switchTab('alumni')">📋 Alumni List</div>
+  <div class="tab" onclick="switchTab('mlb')">⭐ To the Majors</div>
 </div>
 <div class="tab-dropdown-wrap">
   <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:6px;">📋 Select a league</div>
-  <select class="tab-dropdown" onchange="switchTab(this.value)">
+<div class="tab-dropdown-wrap">
+  <div class="tab-dropdown-label">📋 Select a league</div>
+  <select class="tab-dropdown" onchange="switchTab(this.value)" id="giants-select">
     <option value="active">⚾ MLB / Minor Leagues</option>
     <option value="kbo">🇰🇷 Korea (KBO)</option>
     <option value="japan">🇯🇵 Japan (NPB)</option>
-    <option value="fl">🌿 Frontier League</option>
+    <option value="fl">⚾ Independent Leagues</option>
+    <option value="alumni">📋 Alumni List</option>
+    <option value="mlb">⭐ To the Majors</option>
   </select>
+</div>
 </div>
 
 <div class="container">
@@ -242,7 +257,7 @@
     <!-- HIGHLIGHTS -->
     <div class="highlights-section" id="highlights-section">
       <div class="highlights-header">
-        <span class="highlights-title">⚡ Today's Giants in Action</span>
+        <span class="highlights-title" id="highlights-title">⚡ Giants in Action Today</span>
         <span class="highlights-date" id="highlights-date"></span>
         <div class="highlights-line"></div>
       </div>
@@ -262,6 +277,9 @@
   <div class="tab-panel" id="panel-fl">
     <div id="fl-list"></div>
   </div>
+
+  <div class="tab-panel" id="panel-alumni"><div id="alumni-list"></div></div>
+  <div class="tab-panel" id="panel-mlb"><div id="mlb-alumni-list"></div></div>
 
   <div class="site-footer">
     Adelaide Giants Alumni Tracker &nbsp;|&nbsp; Stats via MLB Stats API &nbsp;|&nbsp; Photos via MLB.com
@@ -300,6 +318,7 @@ function profileUrl(p, level) {
 
 const PLAYERS = [
   // MLB
+  { id:552640, name:"Andrew Kittredge",                    pos:"RHP",   type:"pitcher", giantsYears:"ABL Alumni", sportIds:[1,...MILB_IDS] },
   { id:678554, name:"Curtis Mead", australian:true,       pos:"1B/3B", type:"hitter",  giantsYears:"2022", sportIds:[1,...MILB_IDS] },
   { id:681351, name:"Logan O'Hoppe", australian:true,     pos:"C",     type:"hitter",  giantsYears:"2020", sportIds:[1,...MILB_IDS] },
   { id:663897, name:"Luke Williams", australian:true,     pos:"IF/OF", type:"hitter",  giantsYears:"2021", sportIds:[1,...MILB_IDS] },
@@ -323,11 +342,17 @@ const PLAYERS = [
   { id:678620, name:"Blake Townsend", australian:true,    pos:"LHP",   type:"pitcher", giantsYears:"2025", sportIds:MILB_IDS },
   { id:666748, name:"Mitch Neunborn", australian:true,    pos:"RHP",   type:"pitcher", giantsYears:"2022–2024", sportIds:MILB_IDS },
   { id:681495, name:"Cade Fergus", australian:true,       pos:"OF",    type:"hitter",  giantsYears:"2024", sportIds:MILB_IDS },
-  { id:805634, name:"Braeden Fausnaught", australian:true,pos:"LHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+  { id:805634, name:"Braeden Fausnaught",                 pos:"LHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
 
   // New additions
   { id:815694, name:"Lou Albrecht", australian:true,       pos:"C",     type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
   { id:816303, name:"Jack Bushell", australian:true,       pos:"RHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+  { id:813880, name:"Devin Saltiban",                        pos:"SS",    type:"hitter",  giantsYears:"2025", sportIds:MILB_IDS },
+  { id:682774, name:"Andrick Nava",                          pos:"C",     type:"hitter",  giantsYears:"2024", sportIds:MILB_IDS },
+  { id:836037, name:"Mitch Evans", australian:true,          pos:"OF",    type:"hitter",  giantsYears:"2026", sportIds:MILB_IDS },
+  { id:691908, name:"Giusseppe Velasquez",                   pos:"RHP",   type:"pitcher", giantsYears:"2026", sportIds:MILB_IDS },
+  { id:805634, name:"Braeden Fausnaught",                    pos:"LHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
+  { id:688889, name:"Tyler Burch",                           pos:"RHP",   type:"pitcher", giantsYears:"2021", sportIds:MILB_IDS },
 
   // Alumni - older / released
   { id:688011, name:"Cam Wynne",         pos:"RHP",   type:"pitcher", giantsYears:"2024", sportIds:MILB_IDS },
@@ -336,8 +361,22 @@ const PLAYERS = [
 ];
 
 const KBO_PLAYERS = [
-  { name:"Lachlan Wells",    pos:"LHP", type:"pitcher", giantsYears:"2025", level:"KBO", team:"LG Twins",     teamId:null, australian:true, kboStats:{era:"2.06",g:7,gs:7,ip:"39.1",w:2,l:2,k:28,bb:10,whip:"0.97"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=55348" },
-  { name:"Jack O'Loughlin",  pos:"LHP", type:"pitcher", giantsYears:"2026", level:"KBO", team:"Samsung Lions", teamId:null, australian:true, kboStats:{era:"3.38",g:8,gs:8,ip:"37.1",w:2,l:2,k:35,bb:14,whip:"1.34"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=56464" },
+  { name:"Lachlan Wells",    pos:"LHP", type:"pitcher", giantsYears:"2025", level:"KBO", team:"LG Twins",     teamId:null, australian:true, kboStats:{era:"2.06",g:8,gs:8,ip:"45.1",w:2,l:3,k:34,bb:12,whip:"1.06"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=55348",
+    kboGameLog:[
+      {date:"2026-05-10", opp:"@ Hanwha",   dec:"L", ip:"3⅓", r:6, er:5, h:6, hr:0, so:2, bb:2},
+      {date:"2026-05-05", opp:"vs. Doosan", dec:"",  ip:"5",   r:1, er:0, h:4, hr:0, so:2, bb:1},
+      {date:"2026-04-28", opp:"@ KT",       dec:"",  ip:"6",   r:0, er:0, h:3, hr:0, so:8, bb:2},
+      {date:"2026-04-22", opp:"vs. Hanwha", dec:"W", ip:"8",   r:0, er:0, h:1, hr:0, so:7, bb:1},
+      {date:"2026-04-15", opp:"vs. Lotte",  dec:"L", ip:"7",   r:1, er:1, h:3, hr:1, so:3, bb:0},
+    ] },
+  { name:"Jack O'Loughlin",  pos:"LHP", type:"pitcher", giantsYears:"2026", level:"KBO", team:"Samsung Lions", teamId:null, australian:true, kboStats:{era:"3.38",g:8,gs:8,ip:"37.1",w:2,l:2,k:35,bb:14,whip:"1.34"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=56464",
+    kboGameLog:[
+      {date:"2026-05-10", opp:"@ NC",        dec:"W", ip:"6",   r:0, er:0, h:2, hr:0, so:6, bb:2},
+      {date:"2026-05-05", opp:"vs. Kiwoom",  dec:"W", ip:"6",   r:1, er:1, h:4, hr:1, so:7, bb:3},
+      {date:"2026-04-29", opp:"@ Doosan",    dec:"L", ip:"6",   r:3, er:3, h:5, hr:0, so:5, bb:2},
+      {date:"2026-04-23", opp:"vs. SSG",     dec:"",  ip:"6",   r:1, er:1, h:3, hr:0, so:8, bb:3},
+      {date:"2026-04-18", opp:"vs. LG",      dec:"",  ip:"3⅓", r:0, er:0, h:3, hr:0, so:3, bb:0},
+    ] },
   { name:"Byung-Heon Lee",   pos:"OF",  type:"hitter",  giantsYears:"2024", level:"KBO", team:"Samsung Lions", teamId:null, australian:false, kboStats:null, kboNote:"Yet to appear in KBO in 2026", profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoHitter/Summary.aspx?pcode=69428" },
   { name:"Seung-Hyun Lee",   pos:"LHP", type:"pitcher", giantsYears:"2024", level:"KBO", team:"Samsung Lions", teamId:null, australian:false, kboStats:{era:"14.81",g:3,gs:3,ip:"10.1",w:0,l:2,k:6,bb:12,whip:"3.00"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=51454" },
 ];
@@ -355,12 +394,25 @@ const JAPAN_PLAYERS = [
   { name:"Yuta Akihiro",    pos:"P",   type:"pitcher", giantsYears:"2025", level:"NPB", team:"Fukuoka SoftBank Hawks", teamLogoUrl:"https://p.npb.jp/img/common/logo/2026/logo_h_m.gif", australian:true, npbStats:null, npbNote:"Currently in NPB minor leagues", profileUrl:"https://npb.jp/bis/eng/teams/rst_h.html" },
 ];
 
-const FL_PLAYERS = [
-  { name:"Cooper Morgan", pos:"LHP", type:"pitcher", giantsYears:"2026", level:"FL", team:"Quebec Capitales", teamId:null, australian:true, flStats:{era:"0.00",g:1,gs:0,ip:"2.0",w:0,l:0,k:1,bb:1,whip:"0.50"}, profileUrl:"https://pro.iscorecentral.com/FL/players/2f8de703-bf81-4ba1-bee8-ba2e9edeccf2" },
-  { name:"Ky Hampton",    pos:"RHP", type:"pitcher", giantsYears:"2026", level:"FL", team:"Down East Bird Dawgs", teamId:null, australian:true, flStats:null, profileUrl:null },
+// ── INDEPENDENT LEAGUES ──────────────────────────────────────────────────────
+const FRONTIER_PLAYERS = [
+  { name:"Cooper Morgan",          pos:"LHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Québec Capitales",     australian:true,  indStats:{era:"3.00",g:2,gs:0,ip:"3.0",k:4,bb:1,whip:"1.00"},  profileUrl:"https://pro.iscorecentral.com/FL/players/2f8de703-bf81-4ba1-bee8-ba2e9edeccf2" },
+  { name:"Ky Hampton",             pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Down East Bird Dawgs",  australian:true,  indStats:null,                                                  profileUrl:null },
+  { name:"Arlo Marynczak",         pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Tri-City ValleyCats",   australian:false, indStats:{era:"0.00",g:2,gs:0,ip:"2.0",k:4,bb:0,whip:"1.00"},  profileUrl:"https://www.tcvalleycats.com/roster/", note:"2 appearances from the pen" },
+  { name:"Rolando Heredia-Bustos",  pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Down East Bird Dawgs",  australian:false, indStats:{era:"0.00",g:2,gs:0,ip:"4.0",k:2,bb:0,whip:"0.50"},  profileUrl:"https://www.frontierleague.com", note:"2 appearances from the pen" },
 ];
+const ATLANTIC_PLAYERS = [
+  { name:"Conner Greene",          pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Atlantic League",      team:"TBD",                   australian:false, indStats:{era:"2.40",g:3,gs:2,ip:"15.0",k:11,bb:5,whip:"1.20"}, profileUrl:"https://www.atlanticleague.com" },
+];
+const AMERICAN_ASSOC_PLAYERS = [
+  { name:"James Bradwell",         pos:"LHP", type:"pitcher", giantsYears:"2025", league:"American Association", team:"Winnipeg Goldeyes",      australian:false, indStats:null, note:"Season starts May 19",                      profileUrl:"https://www.goldeyes.com" },
+];
+const PIONEER_PLAYERS = [
+  { name:"Briley Knight",          pos:"OF",  type:"hitter",  giantsYears:"2025", league:"Pioneer League",       team:"Billings Mustangs",      australian:true,  indStats:null, note:"Season starts May 19",                      profileUrl:"https://www.billingsmustangs.com/sports/bsb/2026/schedule" },
+];
+const FL_PLAYERS = FRONTIER_PLAYERS;
 
-const MANUAL_UPDATE_DATE = "13 May 2026";
+const MANUAL_UPDATE_DATE = "14 May 2026";
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 
@@ -446,7 +498,7 @@ function buildCard(p, level, team, teamId, seasonStats, cardId, leagueLabel, ext
       </div>
       <div class="mobile-stats">${mobileStat}</div>
       ${!mSrc && minorsNote ? '<div style="font-size:10px;font-weight:800;letter-spacing:0.06em;color:#aaa;text-transform:uppercase;padding:0 1.25rem 0.75rem;">No NPB/KBO stats — player in minors</div>' : ''}
-      <div class="mobile-tap-hint">▼ Tap for game log</div>
+      <div class="mobile-tap-hint">GAME LOG ▾</div>
       <div class="card-right">
         <div class="player-team">
           ${logo}
@@ -591,13 +643,25 @@ async function toggleCard(cardId, playerId, type, level, team, pos, leagueLabel,
     const kboP = KBO_PLAYERS.find(p => p.name === decodeURIComponent(team||""));
     const kboPurl = kboP ? kboP.profileUrl : pUrl;
     const kboNote = kboP?.kboNote || null;
-    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>
-      <div class="gl-header"><span class="gl-title">KBO League — 2026 Season</span>
-      ${kboPurl ? `<a class="gl-link" href="${kboPurl}" target="_blank">View on official KBO site →</a>` : ""}</div>
-      <div class="gl-loading" style="color:#555;text-align:left;padding:1rem 1.25rem;font-size:13px;">
-        ${kboNote ? `<strong>${kboNote}</strong><br><br>` : ""}
-        Stats last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="${kboPurl||'https://eng.koreabaseball.com'}" target="_blank" style="color:#0a2342;font-weight:700;">visit the official KBO player page →</a>
-      </div>`;
+    const gamelog = kboP?.kboGameLog || null;
+    const profileLink = kboPurl ? `<a class="gl-link" href="${kboPurl}" target="_blank">View player profile →</a>` : "";
+    let glHtml = "";
+    if (gamelog && gamelog.length) {
+      const headers = `<tr><th>Date</th><th>Opp</th><th class="r">Dec</th><th class="r">IP</th><th class="r">H</th><th class="r">ER</th><th class="r">SO</th><th class="r">BB</th></tr>`;
+      const rows = gamelog.map(g =>
+        `<tr><td>${g.date.slice(5)}</td><td>${g.opp}</td><td class="r">${g.dec||"—"}</td><td class="r">${g.ip}</td><td class="r">${g.h}</td><td class="r">${g.er}</td><td class="r">${g.so}</td><td class="r">${g.bb}</td></tr>`
+      ).join("");
+      glHtml = `<div class="gl-header"><span class="gl-title">Last 5 Games (KBO)</span>${profileLink}</div>
+        <div class="game-log-table-wrap"><table><thead>${headers}</thead><tbody>${rows}</tbody></table></div>
+        <div style="font-size:11px;color:#aaa;padding:6px 1rem;font-style:italic;">⚠️ Stats entered manually — last updated 14 May 2026.</div>`;
+    } else {
+      glHtml = `<div class="gl-header"><span class="gl-title">KBO League — 2026 Season</span>${profileLink}</div>
+        <div class="gl-loading" style="color:#555;text-align:left;padding:1rem 1.25rem;font-size:13px;">
+          ${kboNote ? `<strong>${kboNote}</strong><br><br>` : ""}
+          Unable to fetch game logs. ${kboPurl ? `<a href="${kboPurl}" target="_blank" style="color:#0a2342;font-weight:700;">View player profile for recent outings →</a>` : ""}
+        </div>`;
+    }
+    logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>${glHtml}`;
     return;
   }
   if (level === "NPB") {
@@ -614,13 +678,16 @@ async function toggleCard(cardId, playerId, type, level, team, pos, leagueLabel,
     return;
   }
   if (level === "FL") {
-    const flP = FL_PLAYERS.find(p => p.name === decodeURIComponent(team||""));
-    const flPurl = flP ? flP.profileUrl : pUrl;
+    const allIndep = [...FRONTIER_PLAYERS, ...ATLANTIC_PLAYERS, ...AMERICAN_ASSOC_PLAYERS, ...PIONEER_PLAYERS];
+    const indP = allIndep.find(p => p.team === team || p.name === decodeURIComponent(team||""));
+    const indPurl = indP?.profileUrl || pUrl;
+    const indLeague = indP?.league || "Independent League";
+    const indNote = indP?.note || null;
+    const profileLink = indPurl ? ` <a href="${indPurl}" target="_blank" style="color:#0a2342;font-weight:600;">View player profile →</a>` : "";
     logEl.innerHTML = `<div class="snapshot">${snapshotHtml}</div>
-      <div class="gl-header"><span class="gl-title">Frontier League — 2026 Season</span>
-      ${flPurl ? `<a class="gl-link" href="${flPurl}" target="_blank">View on iScore Central →</a>` : ""}</div>
-      <div class="gl-loading" style="color:#555;text-align:left;padding:1rem 1.25rem;font-size:13px;">
-        Stats last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="${flPurl||'https://pro.iscorecentral.com/FL/stats'}" target="_blank" style="color:#0a2342;font-weight:700;">visit iScore Central →</a>
+      <div class="gl-loading" style="color:#888;text-align:left;padding:1rem 1.25rem;font-size:13px;font-style:italic;">
+        ${indNote ? `<span style="color:#e8a020;font-weight:700;font-style:normal;">★ ${indNote}</span><br>` : ""}
+        Unable to fetch game logs.${profileLink}
       </div>`;
     return;
   }
@@ -638,9 +705,21 @@ async function toggleCard(cardId, playerId, type, level, team, pos, leagueLabel,
 
 // ── TODAY'S HIGHLIGHTS ────────────────────────────────────────────────────────
 
+function getGiantsAdelaideHour(now) {
+  const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+  const adelaideNow = new Date(utcNow + 9.5 * 60 * 60000);
+  return adelaideNow.getHours() + adelaideNow.getMinutes() / 60;
+}
+function giantsDateBadge(gameDateStr, now) {
+  const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+  const adelaideGame = new Date(new Date(gameDateStr).getTime() + 9.5*60*60000);
+  const adelaideNow  = new Date(utcNow + 9.5*60*60000);
+  const dateLabel = adelaideGame.toLocaleDateString("en-AU", { day:"numeric", month:"short" });
+  return `<span style="color:#aaa;font-size:11px;">(${dateLabel})</span>`;
+}
+
 async function fetchTodaysHighlights(players) {
-  const today = new Date().toLocaleDateString("en-AU", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
-  document.getElementById("highlights-date").textContent = today;
+  document.getElementById("highlights-date").textContent = "";
 
   const logs = await Promise.all(players.map(async p => {
     const group = p.type === "hitter" ? "hitting" : "pitching";
@@ -665,8 +744,8 @@ async function fetchTodaysHighlights(players) {
     .filter(l => {
       if (!l.game.date) return false;
       const gd = new Date(l.game.date);
-      const diffDays = Math.floor((now - gd) / (1000 * 60 * 60 * 24));
-      return diffDays <= 1;
+      const diffHours = (now - gd) / (1000 * 60 * 60);
+      return diffHours <= 36;
     });
 
   if (!highlights.length) {
@@ -707,21 +786,27 @@ async function fetchTodaysHighlights(players) {
       if (hr > 0) statParts.push(`${hr} HR`);
     }
     const statLine = statParts.join(", ");
-    html += `<li><span class="hl-name">${p.name}</span> ${verb} for ${teamName} (${level}) ${vsStr}: <span class="hl-stats">${statLine}</span></li>`;
+    const giantsAbbr = (n) => { if(!n||n==="—")return"—"; const m={"Yankees":"NYY","Mets":"NYM","Dodgers":"LAD","Angels":"LAA","Cubs":"CHC","White Sox":"CWS","Giants":"SFG","Red Sox":"BOS","Astros":"HOU","Braves":"ATL","Nationals":"WSH","Marlins":"MIA","Phillies":"PHI","Pirates":"PIT","Reds":"CIN","Guardians":"CLE","Tigers":"DET","Brewers":"MIL","Twins":"MIN","Cardinals":"STL","Diamondbacks":"ARI","Rockies":"COL","Padres":"SDP","Mariners":"SEA","Rays":"TBR","Rangers":"TEX","Blue Jays":"TOR","Royals":"KCR","Athletics":"OAK","Orioles":"BAL"}; for(const[k,v]of Object.entries(m))if(n.includes(k))return v; return n.split(" ").pop().slice(0,3).toUpperCase(); };
+    const vsStrShort = g.isHome ? `vs ${giantsAbbr(g.opponent?.name)}` : `@ ${giantsAbbr(g.opponent?.name)}`;
+    const dateBadge = giantsDateBadge(g.date, now);
+    html += `<li><span class="hl-name">${p.name}</span> ${dateBadge} — ${teamName} <span style="color:#aaa;font-size:11px;">(${level})</span> ${vsStrShort}: <span class="hl-stats">${statLine}</span></li>`;
   }
   html += '</ul>';
   document.getElementById("highlights-container").innerHTML = html;
 }
 
 // ── TAB SWITCH ───────────────────────────────────────────────────────────────
+let alumniLoaded = false, mlbAlumniLoaded = false;
 function switchTab(name) {
+  if (name === "alumni" && !alumniLoaded) { alumniLoaded = true; renderAlumniTab(); }
+  if (name === "mlb" && !mlbAlumniLoaded) { mlbAlumniLoaded = true; renderMlbAlumniTab(); }
   document.querySelectorAll(".tab").forEach((t,i) => {
-    const names = ["active","kbo","japan","fl"];
+    const names = ["active","kbo","japan","fl","alumni","mlb"];
     t.classList.toggle("active", names[i]===name);
   });
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
   document.getElementById(`panel-${name}`).classList.add("active");
-  const dd = document.querySelector(".tab-dropdown");
+  const dd = document.getElementById("giants-select");
   if (dd) dd.value = name;
 }
 
@@ -794,13 +879,26 @@ async function loadAll() {
   kboHtml += "</div>";
   document.getElementById("kbo-list").innerHTML = kboHtml;
 
-  // ── FL TAB ──
-  let flHtml = manualNotice("Frontier League", "https://pro.iscorecentral.com/FL/stats");
-  flHtml += `<div class="level-section"><div class="level-heading"><span class="level-pill lv-fl">Frontier League</span><div class="level-line"></div><span class="level-count">${FL_PLAYERS.length} players</span></div>`;
-  FL_PLAYERS.forEach((p, i) => {
-    flHtml += buildCard(p, "FL", p.team, null, null, cardIdx++, "Frontier League", p.flStats);
-  });
-  flHtml += "</div>";
+  // ── INDEPENDENT LEAGUES TAB ──
+  let flHtml = manualNotice("Independent Leagues", "https://pro.iscorecentral.com/FL/stats");
+
+  const renderIndepLeague = (players, leagueName, leagueColor, link) => {
+    if (!players.length) return "";
+    let h = `<div class="level-section"><div class="level-heading"><span class="level-pill" style="background:${leagueColor};">${leagueName}</span><div class="level-line"></div><span class="level-count">${players.length} player${players.length!==1?"s":""}</span></div>`;
+    players.forEach(p => {
+      const noteHtml = p.note ? `<div style="font-size:11px;color:#e8a020;font-weight:600;margin-top:4px;">★ ${p.note}</div>` : "";
+      const profileBtn = p.profileUrl ? `<a class="profile-btn" href="${p.profileUrl}" target="_blank" onclick="event.stopPropagation()">↗ Profile</a>` : "";
+      h += buildCard(p, "FL", p.team, null, null, cardIdx++, leagueName, p.indStats);
+    });
+    h += "</div>";
+    return h;
+  };
+
+  flHtml += renderIndepLeague(FRONTIER_PLAYERS,     "Frontier League",       "#2d6a4f", "https://pro.iscorecentral.com/FL/stats");
+  flHtml += renderIndepLeague(ATLANTIC_PLAYERS,     "Atlantic League",       "#1a3a6e", "https://www.atlanticleague.com");
+  flHtml += renderIndepLeague(AMERICAN_ASSOC_PLAYERS,"American Association",  "#7b2d00", "https://www.aabaseballnews.com");
+  flHtml += renderIndepLeague(PIONEER_PLAYERS,      "Pioneer League",        "#4a0072", "https://www.pioneerleague.com");
+
   document.getElementById("fl-list").innerHTML = flHtml;
 
   // ── JAPAN TAB ──
@@ -828,7 +926,203 @@ async function loadAll() {
   fetchTodaysHighlights(PLAYERS);
 }
 
-loadAll();
+// ── ALUMNI LIST ───────────────────────────────────────────────────────────────
+// ── FROM ADELAIDE TO THE MAJOR LEAGUES ───────────────────────────────────────
+function renderMlbAlumniTab() {
+  const MLB_ALUMNI = [
+    { name:"Paul Lo Duca",       years:"1994-95",   mlbNote:"Catcher. 14 MLB seasons. 4× All-Star. NL Champion 2006 with Mets." },
+    { name:"Steve Mintz",        years:"1992-93",   mlbNote:"Pitcher. Appeared in the majors with San Francisco Giants." },
+    { name:"Luke Prokopec",      years:"1995-96",   mlbNote:"★ South Australian. Pitcher. Debuted with LA Dodgers 2000.", aus:true },
+    { name:"Shayne Bennett",     years:"1996-97",   mlbNote:"★ South Australian. Pitcher. Appeared with Montreal Expos.", aus:true },
+    { name:"Mark Hutton",        years:"1994-95",   mlbNote:"★ South Australian. Pitcher. Appeared with New York Yankees & Florida Marlins.", aus:true },
+    { name:"Adam Riggs",         years:"1995-96",   mlbNote:"Infielder. Appeared with LA Dodgers, Angels & Cardinals." },
+    { name:"Felix Rodriguez",    years:"1992-93",   mlbNote:"Pitcher. 9 MLB seasons. Key reliever for Giants in 2002 World Series run." },
+    { name:"Will Brunson",       years:"1995-96",   mlbNote:"Pitcher. Appeared with LA Dodgers." },
+    { name:"Pat Ahearne",        years:"1996-97",   mlbNote:"Pitcher. Appeared with Detroit Tigers." },
+    { name:"Matt Herges",        years:"1998-99",   mlbNote:"Pitcher. 9 MLB seasons with Dodgers, Giants, Rockies & more." },
+    { name:"Jared Weaver",       years:"",          mlbNote:"Pitcher. 11 MLB seasons with LA Angels. 3× All-Star." },
+    { name:"Pat Kelly",          years:"1996-97",   mlbNote:"Infielder. Appeared in the majors." },
+    { name:"Brandon Brantz",     years:"2010-11",   mlbNote:"Pitcher. Appeared with Seattle Mariners." },
+    { name:"James Jones",        years:"2011-12",   mlbNote:"Outfielder. Appeared with Seattle Mariners & New York Mets." },
+    { name:"Brandon Maurer",     years:"2011-12",   mlbNote:"Pitcher. 7 MLB seasons with Mariners, Padres, Royals & more." },
+    { name:"Blake Smith",        years:"2011-12",   mlbNote:"Pitcher. Appeared in the majors." },
+    { name:"Ji-Man Choi",        years:"2012-13",   mlbNote:"First baseman. 7 MLB seasons with Brewers, Yankees, Rays & more." },
+    { name:"Andrew Kittredge",   years:"2013-14",   mlbNote:"Pitcher. Active MLB career with Rays and Orioles. Currently with Baltimore." },
+    { name:"John Holdzkom",      years:"2013-14",   mlbNote:"Pitcher. Appeared with Pittsburgh Pirates." },
+    { name:"Brandon Dixon",      years:"2014-15",   mlbNote:"Infielder. Appeared with Cincinnati Reds & Detroit Tigers." },
+    { name:"Rocky Gale",         years:"2014-15",   mlbNote:"Catcher. Appeared with San Diego Padres." },
+    { name:"Travis Demeritte",   years:"2015-16",   mlbNote:"Outfielder. Appeared with Detroit Tigers, Atlanta Braves & more." },
+    { name:"Aaron Whitefield",   years:"2018-21",   mlbNote:"★ South Australian. Outfielder. Appeared in affiliated ball across multiple seasons.", aus:true },
+    { name:"Luke Williams",      years:"2020-21",   mlbNote:"Infielder. Debuted with Philadelphia Phillies 2021. Currently with Atlanta Braves." },
+    { name:"Logan O'Hoppe",      years:"2019-20",   mlbNote:"Catcher. Debuted with LA Angels 2023. Rising star." },
+    { name:"Curtis Mead",        years:"2017-23",   mlbNote:"★ South Australian. Infielder. Debuted with Tampa Bay Rays 2023. Currently with Washington Nationals.", aus:true },
+    { name:"Jack O'Loughlin",    years:"2016-24",   mlbNote:"★ South Australian. Pitcher. Currently pitching in Korean Baseball League (KBO) for Samsung Lions.", aus:true },
+  ];
+
+  const ausCount = MLB_ALUMNI.filter(p => p.aus).length;
+  const total = MLB_ALUMNI.length;
+
+  let html = `<div style="background:#fff8e8;border-left:4px solid #e8a020;padding:14px 18px;margin-top:1.5rem;margin-bottom:1.5rem;border-radius:0 8px 8px 0;font-size:13px;color:#333;line-height:1.8;">
+    <strong>⭐ From Adelaide to the Major Leagues</strong><br>
+    ${total} players who wore the Giants uniform have gone on to appear in Major League Baseball — including ${ausCount} Australians (★). Listed in order of their Giants debut season.
+    <br><small style="color:#888;">★ = South Australian or Australian player</small>
+  </div>
+  <div class="level-section">
+    <div class="level-heading">
+      <span class="level-pill" style="background:#c41e3a;">${total} MLB Alumni</span>
+      <div class="level-line"></div>
+    </div>`;
+
+  MLB_ALUMNI.forEach((p, i) => {
+    const ausFlag = p.aus ? ' 🇦🇺' : '';
+    const yearsLabel = p.years ? `<span style="background:#f0f0f0;color:#666;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;">${p.years}</span>` : '';
+    html += `<div class="player-card" style="margin-bottom:6px;">
+      <div style="padding:0.85rem 1.25rem;display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:28px;height:28px;background:#c41e3a;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0;margin-top:2px;">${i+1}</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1a1a2e;">${p.name}${ausFlag}${yearsLabel}</div>
+          <div style="font-size:12px;color:#666;margin-top:3px;line-height:1.5;">${p.mlbNote}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  document.getElementById("mlb-alumni-list").innerHTML = html;
+}
+
+function renderAlumniTab() {
+  const eras = [
+    {
+      era: "Claxton Shield Era (1934–1989, 2000–2010)",
+      color: "#5a3a00",
+      seasons: [
+        { season: "1934", players: "1. Keith Gillespie (3) / 2. Norman Hutton (1) / 3. Geoff Jolley (2) / 4. Cecil Keynes (2) / 5. Merv Nelson (1) / 6. Geff Noblet (5) / 7. Paddy Ohlstrom (2) / 8. Richard Pellew (1) / 9. Charlie Puckett (2) / 10. John Ray (1) / 11. Ron Sharpe (5) / 12. Alan Smith (3) / 13. Frank Stapleton (2) / 14. Stanley Swanson (1) / 15. Keith Taylor (4) / 16. Norman Todd (1) / 17. Rolly Vaughton (4)" },
+        { season: "1935", players: "18. John Hill (4) / 19. Bill Homesley (3) / 20. Tom O'Connell (4)" },
+        { season: "1936", players: "21. Murray Booth (1) / 22. Jim Fitzsimmons (1) / 23. Richard Head (1) / 24. Jack Reece (1) / 25. Jack Stevens (1)" },
+        { season: "1937", players: "26. Philip Brideoake (7) / 27. Garth Burton (1) / 28. Len Darling (1) / 29. Doug Madge (1) / 30. Reg Moynagah (2)" },
+        { season: "1938", players: "31. Wally Fails (1) / 32. George Hicks (2) / 33. Ross Moyle (2) / 34. Doug Mundy (1) / 35. Alfred Norman (2) / 36. Clem Scott (3)" },
+        { season: "1939", players: "37. Alan Branstrom (4) / 38. Arnold Carter (1) / 39. Fred Catt (6) / 40. Ashley Gould (1) / 41. Jim Puckett (2) / 42. Bill Radbone (8)" },
+        { season: "1946", players: "43. Ron Brearley (5) / 44. Martin Chappell (2) / 45. Colin Dew (1) / 46. Bruce Dooland (3) / 47. Malcolm Le Cornu (3) / 48. Ken Rankin (3) / 49. Des Vaughton (4)" },
+        { season: "1947", players: "50. Percy Earle (2) / 51. Con Kenneally (2) / 52. Morrie Sykes (3) / 53. Norm White (10) / 54. Barry Wiles (6)" },
+        { season: "1948", players: "55. Phil Bryant (1) / 56. Jack Green (1) / 57. Brian Hill (5) / 58. Ian Leahy (4) / 59. Laurie Smart (2)" },
+        { season: "1949", players: "60. Gordon Fidock (3) / 61. Don Fuller (1) / 62. Reg McGee (1) / 63. Bob Quintrell (3) / 64. Dave Roberts (11) / 65. Bill Wyett (1)" },
+        { season: "1950", players: "66. Peter Lovett (2) / 67. Don Martin (5) / 68. Bob O'Connell (1) / 69. Colin Payne (4) / 70. Peter Thomas (3) / 71. Colin Watts (3)" },
+        { season: "1951", players: "72. Doug Fidock (1) / 73. Graeme Hole (2) / 74. Jack Mitchell (1)" },
+        { season: "1952", players: "75. Bruce Harris (6) / 76. Claude Pearce (2) / 77. Ted Ramsay (3) / 78. Ray Thomas (1)" },
+        { season: "1953", players: "79. Peter Box (7) / 80. Brian Brooks (1) / 81. Les Flavell (2) / 82. Max Goldsworthy (1) / 83. Doug Othams (2) / 84. Rex Sands (1) / 85. Colin Wirth (2)" },
+        { season: "1954", players: "86. Graham Fenwick (5) / 87. Bill Fuller (5) / 88. John Horley (5)" },
+        { season: "1955", players: "89. Bob Brock (2) / 90. Brian Gibbons (2) / 91. Gordon Harrison (1) / 92. Ken Mitchell (1)" },
+        { season: "1956", players: "93. Dean Harrison (2) / 94. John Langley (2) / 95. Fred Medley (8) / 96. Gerry Roberts (6)" },
+        { season: "1957", players: "97. Jim Cocks (6) / 98. Ken Frost (4) / 99. Noel Gully (2) / 100. Max Puckett (6) / 101. Kingsley Wellington (6)" },
+        { season: "1958", players: "102. Rod Barton (4) / 103. Mel Dunn (2) / 104. Graham Harris (5) / 105. Barry Jolley (5) / 106. Sam Sutton (3)" },
+        { season: "1959", players: "107. Ian Glover (4) / 108. John McGregor (1) / 109. Don Roach (1) / 110. Brian Sharpe (4)" },
+        { season: "1960", players: "111. Ron Biddell (1) / 112. Kevin Medley (11) / 113. Norm Nelson (1) / 114. Ron Russ (4) / 115. Jim Tamlin (2) / 116. Mal Thickett (4)" },
+        { season: "1962", players: "117. Bill Bowden (1) / 118. Don Rice (6)" },
+        { season: "1963", players: "119. Ron Chandler (6) / 120. Malcolm Clements (6) / 121. Neil Davey (4) / 122. Kevin Greatrex (16) / 123. Chris Harman (1) / 124. Gus Merkel (1) / 125. Adrian Pearce (10) / 126. Brian Scott (9) / 127. Murray Small (1) / 128. Murray Young (1)" },
+        { season: "1964", players: "129. Wayne Burton (2) / 130. Ian Chappell (3) / 131. Max Harris (4) / 132. Neil Page (8) / 133. Garry Thompson (10) / 134. Dave Watson (2)" },
+        { season: "1965", players: "135. Malcolm Klopp (1) / 136. David Mundy (17)" },
+        { season: "1966", players: "137. Bob Barnes (1) / 138. Rex Blundell (1) / 139. Don Masters (12) / 140. Malcolm McLachlan (10) / 141. Richard Shirt (4)" },
+        { season: "1967", players: "142. Phil Alexander (12) / 143. David Hutton (1) / 144. David McLoud (3) / 145. Denys Smith (1)" },
+        { season: "1968", players: "146. Les Buller (4) / 147. Alan Cleanthous (2) / 148. Wayne Durbridge (7) / 149. Stephen James (1)" },
+        { season: "1969", players: "150. Kevin Noel (1)" },
+        { season: "1970", players: "151. Ross Brown (4) / 152. John Davis (3)" },
+        { season: "1971", players: "153. Kym Hargrave (5) / 154. Brian Vaughton (1)" },
+        { season: "1972", players: "155. Warwick Dooland (4) / 156. Dean Forbes (4) / 157. David Gooley (3) / 158. John Gooley (3) / 159. Zygmont Sobolski (3)" },
+        { season: "1973", players: "160. Ian Denny (2) / 161. Ron Hocking (3)" },
+        { season: "1974", players: "162. Colin Alexander (6) / 163. John Galloway (9) / 164. David Ziersch (7)" },
+        { season: "1975", players: "165. Les Behrendt (1) / 166. Brian Cakebread (14) / 167. Gary Coward (6) / 168. Trevor King (1) / 169. Mark Peters (9) / 170. Craig Roeger (2)" },
+        { season: "1976", players: "171. Nick Kuring (4) / 172. Ian Lobb (2) / 173. Warwick Marks (8)" },
+        { season: "1977", players: "174. Gary Challen (4) / 175. Brian Hazelhurst (1) / 176. Malcolm Loveday (5) / 177. John Lowry (1) / 178. Orrie Sawczak (8) / 179. Richard Smith (1) / 180. Robert Surplice (4) / 181. Steve Tonkin (1)" },
+        { season: "1978", players: "182. David Doonan (3) / 183. Dean Towill (7)" },
+        { season: "1979", players: "184. Greg Elkson (8) / 185. Graeme Masters (2) / 186. Stephen Rex (2)" },
+        { season: "1980", players: "187. Phil Burgess (4) / 188. Harvey Hicks (3) / 189. David Rowe (2)" },
+        { season: "1981", players: "190. Martin Beyer (2) / 191. Neil Stewart (2)" },
+        { season: "1982", players: "192. Jeff Downs (1) / 193. Darren Roberts (4) / 194. Lincoln Rowe (4) / 195. Denis Telfer (4)" },
+        { season: "1983", players: "196. Geoff Bahnert (5) / 197. Chuck Belk (1) / 198. Mark Born (5) / 199. Wayne Brooks (5) / 200. Tim Day (5) / 201. Tony Harris (9) / 202. Grant Puckett (7) / 203. Eric Stacey (1) / 204. Garry Tucker (2)" },
+        { season: "1984", players: "205. Barrie Bahnert (5) / 206. Neil Bradshaw (2) / 207. Roger Gallardo (1) / 208. Phil Lounder (3) / 209. Gerry Moar (1) / 210. Gavin Robinson (3) / 211. Tony Tyson (1)" },
+        { season: "1984-85", players: "212. Grant Marschall (1) / 213. Ian Reval (5) / 214. Darren Welch (2)" },
+        { season: "1985-86", players: "215. Mark Fehervari (2) / 216. Jim Gladstone (2) / 217. Derek Keane (1) / 218. Neville Wright (2)" },
+        { season: "1986-87", players: "219. Brett Ettridge (2) / 220. Paul Green (3) / 221. Peter Hoare (1) / 222. Michael Loader (1) / 223. Gary Rice (2) / 224. Andrew Scott (3)" },
+        { season: "1987-88", players: "225. Rick Beattie (1) / 226. Andrew Bennett (2) / 227. Brian Farley (1) / 228. Malcolm Gregg (2) / 229. Brett Harris (2) / 230. Glen J. Jones (1) / 231. Glen G. Jones (1) / 232. Doug La Valley (1) / 233. Tim Mead (1) / 234. Brett Tolman (1) / 235. Philip White (2)" },
+        { season: "1988-89", players: "No competition" },
+        { season: "1989", players: "236. Darren Boydon (1) / 237. Nathan Davison (2) / 238. Dominic Hodges (1) / 239. Vango Pantazis (1) / 240. Jano Perez (1) / 241. Mark Van Pelt (1)" },
+        { season: "1999-2000", players: "242. Paul Ashworth (1) / 243. Tom Becker (4) / 244. Kym Biggins (1) / 245. Lachlan Burrows (4) / 246. John Challinor (5) / 247. Calvin Chipperfield (3) / 248. Justin Clark (1) / 249. Andrew Couzner (1) / 250. Darren Fidge (10) / 251. David Forbes (1) / 252. Michael Forbes (3) / 253. Scott Marshall (1) / 254. Terry Millwood (1) / 255. Daniel Page (5) / 256. Luke Prokopec (1) / 257. Ryan Seeley (2) / 258. Glen Simmons (2) / 259. Marc Taintey (7) / 260. Sam Tibbits (3) / 261. Burke Weber (1) / 262. Ben Wigmore (1)" },
+        { season: "2000-01", players: "No competition" },
+        { season: "2001-02", players: "263. Simon Borlace (1) / 264. Ben Dixon (4) / 265. Simon Galpin (6) / 266. Dylan Martin (2) / 267. Paul Mildren (7) / 268. Leigh Neuage (2) / 269. Daniel Phelan (1) / 270. Ryan Simunsen (1) / 271. Craig Watts (7) / 272. Darren White (2) / 273. Dale Ziersch (3)" },
+        { season: "2002-03", players: "274. Shayne Bennett (2) / 275. Tom Brice (4) / 276. Josh Frick (1) / 277. Kane Galloway (1) / 278. Tyrone Hambly (2) / 279. Jamie Kloeden (3) / 280. Leigh Norman (2) / 281. Damien Norsworthy (1) / 282. Daniel Redden (4) / 283. Jason Scott (1) / 284. Tristan Stevens (2) / 285. Adam Widdison (2) / 286. Daniel Wilson (8)" },
+        { season: "2003-04", players: "287. Josh Cakebread (4) / 288. Troy Cook (3) / 289. Scott Gladstone (2) / 290. Todd Langman (4) / 291. Dushan Rusic (6)" },
+        { season: "2004-05", players: "292. Ben Brusnahan (2) / 293. Adrian Burnside (1) / 294. Leigh Chenoweth (1) / 295. Shane Jennings (1) / 296. Andrew Taintey (1) / 297. Jay Ziersch (3)" },
+        { season: "2005-06", players: "298. Jeremy Cresswell (5) / 299. Tyler Green (2) / 300. Nick Talbot (3) / 301. Stefan Welch (5)" },
+        { season: "2006-07", players: "302. Matt Dunn (1) / 303. Lachlan Eldridge (1) / 304. Ben Hilterbrand (1) / 305. Chris Lawson (4) / 306. Taj Merrill (2) / 307. Torey Williams (2)" },
+        { season: "2007-08", players: "308. Tom Fiebig (2) / 309. Josh Golotta (1) / 310. Brendan Pett (2) / 311. Jonathan Rex (1) / 312. Josh Tols (1)" },
+        { season: "2008-09", players: "313. Phil Brassington (1) / 314. Michael Ewart (1) / 315. Mitchell Fienemann (1) / 316. Jared Kempf (1) / 317. Justin Roe (1) / 318. Angus Roeger (2) / 319. Brodie Wyatt (1)" },
+        { season: "2009-10", players: "320. Richard Bartlett (1) / 321. Haydn Beard (1) / 322. Michael Collins (1) / 323. Ryan Murphy (1) / 324. Steven O'Connor (1) / 325. Wayne Ough (1) / 326. Matthew Smith (1) / 327. David Washington (1)" },
+      ]
+    },
+    {
+      era: "1989–1999: Original ABL",
+      color: "#c41e3a",
+      seasons: [
+        { season: "1989-90", players: "1. Darren Garrick / 2. Ron Nelson / 3. Max Hardy / 4. Andrew Scott / 5. Tim Day (WT) / 6. Jim Ferguson / 7. Mark Van Pelt / 8. Barrie Bahnert / 9. Brett Ettridge / 10. Mark Born / 11. Paul Green / 12. Dominic Hodges / 13. Brian Farley / 14. Grant Puckett / 15. Nathan Davison / 16. Brian Cakebread / 17. Gary Rice / 18. Phil Burgess / 19. Malcolm Gregg / 20. Ian Reval / 21. Tony Harris / 22. Rick Mead / 23. Tim Mead / 24. Andrew Bennett / 25. Troy Scoble / 26. Greg Elkson / 27. Brett Harris / 28. Robert Piscetta / 29. Rod Hardy / 30. Burke Weber / 31. Darren Welch / 32. Vango Pantazis" },
+        { season: "1990-91", players: "33. Bill Wengert / 34. Brett Magnusson / 35. Dino Ebel / 36. Darren J. White (H&G) / 37. John Knapp / 38. Glenn J. Jones / 39. Jamie Bushell / 40. Phillip White" },
+        { season: "1991-92", players: "41. Darrin Kirwin / 42. John Deutsch / 43. Andrew Hood / 44. Sean Snedeker / 45. Ron Maurer / 46. Craig Watts / 47. Michael Dunn / 48. Jody Treadwell / 49. Kym Biggins / 50. Peter Arnold / 51. John Mellor / 52. Gene Vaninetti / 53. Darren Fidge" },
+        { season: "1992-93", players: "54. Stephen Mintz / 55. Felix Rodriguez / 56. Darren J. White (Adelaide) / 57. Vernon Spearman / 58. Jamie Daspit / 59. Kym Ashworth / 60. David Carter / 61. Anthony Dienelt / 62. Ashley Rosenthal / 63. Adam Roe" },
+        { season: "1993-94", players: "64. John Challinor / 65. Sean Conlon / 66. Jay Kirkpatrick / 67. Jason Brosnan / 68. Richard Linares / 69. Anthony Coxon" },
+        { season: "1994-95", players: "70. Randall Birt / 71. Paul La Duca / 72. James Martin / 73. Terry Millwood / 74. Simon Pole / 75. Adam Widdison / 76. Jesus Martinez / 77. Kevin Pincavitch / 78. Scott Marshall / 79. Andrew Quessier / 80. Andrew Taintey / 81. Matthew McDougall / 82. Mark Hutton / 83. Scott Pratt" },
+        { season: "1995-96", players: "84. Brad Danbridge / 85. Adam Riggs / 86. Mark Paparella / 87. Tom Becker / 88. Andrew Couzner / 89. Adam Nicks / 90. Will Brunson / 91. Jay Ivanoff / 92. Tony Sharpe / 93. Luke Prokopec / 94. Nelson Castro / 95. Micheal Metcalfe" },
+        { season: "1996-97", players: "96. Shayne Bennett / 97. Darren Phillips / 98. Pat Kelly / 99. Scott Telfer / 100. Pat Ahearne / 101. Adrian Burnside / 102. Chris Dunkin / 103. David Spykstra / 104. Clifford Anderson / 105. Daniel Ricabel / 106. Calvin Chipperfield" },
+        { season: "1997-98", players: "107. David Steed / 108. Kevin Fairclough / 109. Marc Taintey / 110. Joe Lagarde / 111. Daniel Bakurski / 112. Eric Weaver / 113. Sam Tibbits / 114. Darrin Babineaux / 115. Michael Forbes / 116. Brad Boyd" },
+        { season: "1998-99", players: "117. Matthew Herges / 118. Graham Ingram / 119. Jason Hewitt / 120. Ric Bennet / 121. Eric Stuckenschneider / 122. Don Sell / 123. Jay Ziersch / 124. Blake Mayo / 125. Jeff Williams" },
+      ]
+    },
+    {
+      era: "2010–Present: Current ABL",
+      color: "#1a1a2e",
+      seasons: [
+        { season: "2010-11", players: "126. Paul Mildren / 127. Brandon Brantz / 128. Tom Brice / 129. Matthew Smith / 130. Stefan Welch / 131. Jeremy Cresswell / 132. Quincy Latimore / 133. James McOwen / 134. Daniel Wilson / 135. Ben Wigmore / 136. Chris Lawson / 137. Todd Gossage / 138. Scott Gladstone / 139. Wayne Ough / 140. Ryan Murphy / 141. Reed Brown / 142. Brandon Maurer / 143. Brendan Pett / 144. Josh Cakebread / 145. Dushan Ruzic / 146. Jackson Lodge / 147. Nick Talbot / 148. Josh Tols / 149. Lachlan Eldridge / 150. Mark Brackman / 151. Alex Derhak / 152. Yong Sup Kwak / 153. Wilson Lee" },
+        { season: "2011-12", players: "154. Chris Adamson / 155. Calvin Anderson / 156. Chin-Lung Hu / 157. James Jones / 158. Denny Almonte / 159. Jandy Sena / 160. Ben Lodge / 161. Dakota Mitchell / 162. Carlton Tanabe / 163. Jason Daniels / 164. Ryan Beckman / 165. Hiroshi Katayama / 166. Rinku Singh / 167. Ryohei Isaka / 168. Jarryd Klemm / 169. Derrick Miramontes / 170. James Boling / 171. Owen Ozanich" },
+        { season: "2012-13", players: "172. Zac Fuesser / 173. Dylan Child / 174. Justin Howard / 175. Nathan Melendres / 176. Angus Roeger / 177. Adam Crabb / 178. Dennis Christiansen / 179. Gabe Suarez / 180. Aaron Pribanic / 181. Nathan Van der Linden / 182. Nick Hutchings / 183. Richard Olson / 184. Andrew Kittredge / 185. Ethan Paquette / 186. Ji-Man Choi / 187. Seon Gi Kim / 188. Jackson Brebner-Russ / 189. Troy Weinert / 190. Adam Kam / 191. Damian Seguen / 192. Tim P. Day – Glenelg / 193. Gary Owens / 194. Shaun Wright" },
+        { season: "2013-14", players: "195. David Holman / 196. John Cannon / 197. Chris Jacobs / 198. Brock Hebert / 199. Joe Sclafani / 200. James Baldwin / 201. Elliot Smith / 202. Blake Smith / 203. Brandon Kuter / 204. Matthew Williams / 205. Blake Holovach / 206. James Campbell / 207. Kyle Brueggemann / 208. John Holdzkom / 209. Beau Bishop / 210. Fu-Te Ni / 211. Min-Sih Chen / 212. T J Hose / 213. Byron Wiley / 214. Matt Wickstat / 215. Nick Valenza / 216. Andrew Davis" },
+        { season: "2014-15", players: "217. Rocky Gale / 218. Brandon Dixon / 219. Craig Maddox / 220. Chan Jong Moon / 221. Mitch Denning / 222. Aaron Miller / 223. Corey Lyon / 224. Kyle Hooper / 225. Troy Scott / 226. Craig Stem / 227. Colin Feldtman / 228. Will Mathis / 229. Morgan Coombs / 230. Tyler Brunnermann / 231. Tony Vocca / 232. Connor Little / 233. Michael Miller / 234. Austin Wobrock / 235. Tyrone Hambly / 236. Josh Silvi / 237. William Thorp / 238. Simon Wark / 239. Connar O'Gorman / 240. Landon Hernandez / 241. Virgil Vasquez" },
+        { season: "2015-16", players: "242. Steven Chambers / 243. Kyle Petty / 244. Travis Demeritte / 245. Jordan Cowan / 246. Marc Wik / 247. Kevin Comer / 248. Kyal Williams / 249. Chris Dula / 250. Matthew Swilley / 251. Devon Barker / 252. Kody Kerski / 253. Daniel Nilsson / 254. Elroy Urbina / 255. Mitch Lightbody / 256. Dallas Gallant / 257. Davis Page / 258. Mason Pickard / 259. Christopher Horne / 260. Travis Tingle / 261. Scott Quinlan / 262. Hei-Chen Lee / 263. Loek van Mil / 264. Thomas Fiebig / 265. Daniel DeSimone / 266. Jake Cairns / 267. John Schultz / 268. Takuro Ito / 269. Karl Hoschke" },
+        { season: "2016-17", players: "270. Sean Callegari / 271. Marcus Greene Jr. / 272. Le Darious Clark / 273. Josh Altmann / 274. Tyler Chappell / 275. Zach Cooper / 276. Jordan McArdle / 277. Taylor Hawkins / 278. Jack O'Loughlin / 279. Greg Mosel / 280. Sebastiaan Nooij / 281. Kentaro Ueda / 282. Max MacNabb / 283. Ky Hampton / 284. Alex Carter / 285. Tom McGarry / 286. Arik Sikula / 287. Nathaniel Roe / 288. James Snelgrove / 289. Max Brown" },
+        { season: "2017-18", players: "290. Max Beatty / 291. Isais Quiroz / 292. Stephen Lohr / 293. Rodrigo Ayarza / 294. Darius Day / 295. Chang Tai-Shan / 296. Chris Powell / 297. Chris Burkholder / 298. Curtis Mead / 299. Dylan Ridding / 300. Tyson McKee / 301. Mason Clavell / 302. Ryan Duncan / 303. Will Kortekaas / 304. Chen Kuan-Jen / 305. Ryo Koura / 306. Harrison Knuckey / 307. Brodie Arriola / 308. Griffen Weber / 309. Sean Maple" },
+        { season: "2018-19", players: "310. Kurt Heyer / 311. Mitchell Edwards / 312. Mikey Reynolds / 313. Nick Shumpert / 314. Aaron Whitefield / 315. Michael Gettys / 316. Todd McDonald / 317. Jorge Perez / 318. Tohru Kikue / 319. Marcus Solbach / 320. Ryan Chaffee / 321. Bruce Wang / 322. Michael Gahan / 323. Ryo Takeuchi / 324. Jared Wilson / 325. Matt Hutchings / 326. Austin Gallagher / 327. Tom Fitzgerald / 328. Roger Huadancarairang / 329. Blake Farr / 330. Dylan Brammer / 331. Hirotaka Tochiya / 332. Yoshihiro Tamura / 333. Tyler Thompson" },
+        { season: "2019-20", players: "334. Dustin Beggs / 335. Rixon Wingrove / 336. Eric Peterson / 337. Ben Aklinski / 338. Cole Stobbie / 339. Daina Ono / 340. Jason Lott / 341. Logan O'Hoppe / 342. Evan Rutckyj / 343. Gunnar Kines / 344. Daigo Nushijima / 345. David Holmberg / 346. Chase Cunningham / 347. Jeremy Hazelbaker / 348. Jose Taveras / 349. Daniel Procopio / 350. Tyler Beardsley / 351. Jack Higginbotham" },
+        { season: "2020-21", players: "352. Grant Little / 353. Kendall Simmons / 354. Cornelius Randolph / 355. Luke Williams / 356. Todd van Steensel / 357. Taylor Lehman / 358. Mitchell Hughson / 359. Mitch Neunborn / 360. Luke Wilkins / 361. Austin Ross / 362. Riley Moore / 363. Jonathan Hennigan / 364. Colby Fitch / 365. Tyler Burch / 366. Elliot Johnstone / 367. Wade McConnon" },
+        { season: "2022-23", players: "368. Miguel Cienfuegos / 369. Arturo De Freitas / 370. Nick Ward / 371. Luis Aviles Jr. / 372. Jared Carr / 373. Anthony Quirion / 374. Nika Torres-Costa / 375. Joe Johnson / 376. Quinton Torres-Costa / 377. Adam McKillian / 378. Jack Partington / 379. Liam Bull / 380. Starlyn Castillo / 381. Riley Yeatman / 382. Jordy Grose / 383. Sam Street / 384. Jordan Fowler / 385. Liam Spence / 386. Jarod Large / 387. Jarryd Rogers / 388. Bubby Rossman III / 389. Ian Walters / 390. Ryan January / 391. Dylan Unsworth / 392. Michael Martinez" },
+        { season: "2023-24", players: "393. Lachlan Wells / 394. Andrick Nava / 395. Byung-Heon Lee / 396. Cade Fergus / 397. Drew Janssen / 398. Cam Wynne / 399. Zac Altamura / 400. Ali Tanner / 401. Oscar Nakaoshi / 402. Seung-Hyun Lee / 403. Braeden Fausnaught / 404. Kwon-Hoo Park / 405. Toru Marata / 406. Stephen Chamblee / 407. Briley Knight / 408. Jack Bushell / 409. Josh Bortka / 410. Daniel McGarth / 411. Drew Davies / 412. Nic Paparella" },
+        { season: "2024-25", players: "413. Trent Farquhar / 414. Niko Hulsizer / 415. Yuto Akihiro / 416. Luis Caicuto / 417. Ryusei Yamada / 418. Carson Angeroth / 419. Konsta Kurikka / 420. Lou Albrecht / 421. Mako Kyomoto / 422. Estibenzon Jimenez / 423. James Bradwell / 424. Matt Osterberg / 425. Darcy Longstaff / 426. Blake Townsend / 427. Diego Gonzalez" },
+        { season: "2025-26", players: "428. Yusei Ishizaka / 429. Yu Aramaki / 430. Devin Saltiban / 431. Alirio Ferrebus / 432. Cameron Tilly / 433. James McFarlane / 434. Liam Scott / 435. Tomoki Tamura / 436. Camron Hill / 437. Cooper Morgan / 438. Connor Greene / 439. Giussepe Velasquez / 440. Yamato Shiroki / 441. Adenson Verastegui / 442. Danyony Pulido / 443. Ben Fierenzi" },
+      ]
+    }
+  ];
+
+  let html = `<div style="background:#f0f4ff;border-left:4px solid #1a1a2e;padding:14px 18px;margin-top:1.5rem;margin-bottom:1.5rem;border-radius:0 8px 8px 0;font-size:13px;color:#333;line-height:1.8;">
+    <strong>📋 Forever Giant — Alumni List</strong><br>
+    There have been <strong>443</strong> players to play in the ABL for Adelaide. There have been <strong>327</strong> players to play Claxton Shield for South Australia.<br>
+    Compiled by Phil Burgess. Sorted by Player Debut Number, Name and State Team Selections.
+  </div>`;
+
+  for (const { era, color, seasons } of eras) {
+    html += `<div class="level-section">
+      <div class="level-heading">
+        <span class="level-pill" style="background:${color};">${era}</span>
+        <div class="level-line"></div>
+      </div>`;
+    for (const { season, players } of seasons) {
+      const isNoComp = players === "No competition";
+      html += `<div style="margin-bottom:0.6rem;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.05);padding:0.65rem 1.25rem;display:flex;gap:12px;align-items:baseline;">
+        <span style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${color};white-space:nowrap;min-width:64px;flex-shrink:0;">${season}</span>
+        <p style="font-size:13px;color:${isNoComp?"#aaa":"#333"};line-height:1.8;margin:0;font-style:${isNoComp?"italic":"normal"};">${players}</p>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  document.getElementById("alumni-list").innerHTML = html;
+}loadAll();
 </script>
 </body>
 </html>
