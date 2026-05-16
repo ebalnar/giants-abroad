@@ -182,14 +182,14 @@
     .game-log table { min-width:280px; }
 
     /* Mobile tab dropdown */
-    .tab-dropdown-wrap { display:none; position:sticky; top:0; z-index:100; background:#1a1a2e; border-bottom:3px solid #e8a020; box-shadow:0 3px 12px rgba(0,0,0,0.2); padding:10px 12px; }
+    .tab-dropdown-wrap { display:flex; position:sticky; top:0; z-index:100; background:#1a1a2e; border-bottom:3px solid #e8a020; box-shadow:0 3px 12px rgba(0,0,0,0.2); padding:10px 12px; }
     .tab-dropdown { width:100%; padding:13px 16px; font-size:15px; font-weight:800; letter-spacing:0.03em; border:2px solid #e8a020; border-radius:8px; background:#fff; color:#1a1a2e; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%23e8a020' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
     @media (max-width:700px) {
       .tabs { display:none !important; }
       .tab-dropdown-wrap { display:block; }
     }
 
-    .tab-dropdown-wrap { display:none; position:sticky; top:0; z-index:200; background:#1a1a2e; border-bottom:3px solid #e8a020; box-shadow:0 3px 12px rgba(0,0,0,0.2); padding:8px 12px; flex-direction:column; align-items:stretch; }
+    .tab-dropdown-wrap { display:flex; position:sticky; top:0; z-index:200; background:#1a1a2e; border-bottom:3px solid #e8a020; box-shadow:0 3px 12px rgba(0,0,0,0.2); padding:8px 12px; flex-direction:column; align-items:stretch; }
     .tab-dropdown-label { font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.7); margin-bottom:5px; }
     .tab-dropdown { width:100%; padding:10px 36px 10px 12px; font-size:14px; font-weight:700; border:2px solid #e8a020; border-radius:8px; background:#fff; color:#1a1a2e; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8a020' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; cursor:pointer; }
     @media (max-width:700px) {
@@ -369,13 +369,13 @@ const KBO_PLAYERS = [
       {date:"2026-04-22", opp:"vs. Hanwha", dec:"W", ip:"8",   r:0, er:0, h:1, hr:0, so:7, bb:1},
       {date:"2026-04-15", opp:"vs. Lotte",  dec:"L", ip:"7",   r:1, er:1, h:3, hr:1, so:3, bb:0},
     ] },
-  { name:"Jack O'Loughlin",  pos:"LHP", type:"pitcher", giantsYears:"2026", level:"KBO", team:"Samsung Lions", teamId:null, australian:true, kboStats:{era:"3.38",g:8,gs:8,ip:"37.1",w:2,l:2,k:35,bb:14,whip:"1.34"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=56464",
+  { name:"Jack O'Loughlin",  pos:"LHP", type:"pitcher", giantsYears:"2026", level:"KBO", team:"Samsung Lions", teamId:null, australian:true, kboStats:{era:"3.33",g:9,gs:9,ip:"46.0",w:3,l:2,k:45,bb:19,whip:"1.17"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=56464",
     kboGameLog:[
+      {date:"2026-05-16", opp:"vs. KIA",     dec:"W", ip:"6",   r:2, er:2, h:4, hr:1, so:5, bb:2},
       {date:"2026-05-10", opp:"@ NC",        dec:"W", ip:"6",   r:0, er:0, h:2, hr:0, so:6, bb:2},
       {date:"2026-05-05", opp:"vs. Kiwoom",  dec:"W", ip:"6",   r:1, er:1, h:4, hr:1, so:7, bb:3},
       {date:"2026-04-29", opp:"@ Doosan",    dec:"L", ip:"6",   r:3, er:3, h:5, hr:0, so:5, bb:2},
       {date:"2026-04-23", opp:"vs. SSG",     dec:"",  ip:"6",   r:1, er:1, h:3, hr:0, so:8, bb:3},
-      {date:"2026-04-18", opp:"vs. LG",      dec:"",  ip:"3⅓", r:0, er:0, h:3, hr:0, so:3, bb:0},
     ] },
   { name:"Byung-Heon Lee",   pos:"OF",  type:"hitter",  giantsYears:"2024", level:"KBO", team:"Samsung Lions", teamId:null, australian:false, kboStats:null, kboNote:"Yet to appear in KBO in 2026", profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoHitter/Summary.aspx?pcode=69428" },
   { name:"Seung-Hyun Lee",   pos:"LHP", type:"pitcher", giantsYears:"2024", level:"KBO", team:"Samsung Lions", teamId:null, australian:false, kboStats:{era:"14.81",g:3,gs:3,ip:"10.1",w:0,l:2,k:6,bb:12,whip:"3.00"}, profileUrl:"https://eng.koreabaseball.com/Teams/PlayerInfoPitcher/Summary.aspx?pcode=51454" },
@@ -396,7 +396,7 @@ const JAPAN_PLAYERS = [
 
 // ── INDEPENDENT LEAGUES ──────────────────────────────────────────────────────
 const FRONTIER_PLAYERS = [
-  { name:"Cooper Morgan",          pos:"LHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Québec Capitales",     australian:true,  indStats:{era:"3.00",g:2,gs:0,ip:"3.0",k:4,bb:1,whip:"1.00"},  profileUrl:"https://pro.iscorecentral.com/FL/players/2f8de703-bf81-4ba1-bee8-ba2e9edeccf2" },
+  { name:"Cooper Morgan",          pos:"LHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Québec Capitales",     australian:true,  indStats:{era:"2.70",g:3,gs:0,ip:"3.1",k:4,bb:1,whip:"0.90"},  profileUrl:"https://pro.iscorecentral.com/FL/players/2f8de703-bf81-4ba1-bee8-ba2e9edeccf2" },
   { name:"Ky Hampton",             pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Down East Bird Dawgs",  australian:true,  indStats:null,                                                  profileUrl:null },
   { name:"Arlo Marynczak",         pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Tri-City ValleyCats",   australian:false, indStats:{era:"0.00",g:2,gs:0,ip:"2.0",k:4,bb:0,whip:"1.00"},  profileUrl:"https://www.tcvalleycats.com/roster/", note:"2 appearances from the pen" },
   { name:"Rolando Heredia-Bustos",  pos:"RHP", type:"pitcher", giantsYears:"2026", league:"Frontier League",      team:"Down East Bird Dawgs",  australian:false, indStats:{era:"0.00",g:2,gs:0,ip:"4.0",k:2,bb:0,whip:"0.50"},  profileUrl:"https://www.frontierleague.com", note:"2 appearances from the pen" },
@@ -412,7 +412,7 @@ const PIONEER_PLAYERS = [
 ];
 const FL_PLAYERS = FRONTIER_PLAYERS;
 
-const MANUAL_UPDATE_DATE = "14 May 2026";
+const MANUAL_UPDATE_DATE = "17 May 2026";
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 
@@ -745,6 +745,11 @@ async function fetchTodaysHighlights(players) {
       if (!l.game.date) return false;
       const gd = new Date(l.game.date);
       const diffHours = (now - gd) / (1000 * 60 * 60);
+      // Reset window: 11:59pm to 2:30am Adelaide — hide results
+      const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+      const adelaideNow = new Date(utcNow + 9.5 * 60 * 60000);
+      const adelaideHour = adelaideNow.getHours() + adelaideNow.getMinutes() / 60;
+      if (adelaideHour >= 23.98 || adelaideHour < 2.5) return false;
       return diffHours <= 36;
     });
 
@@ -878,7 +883,24 @@ async function loadAll() {
     <strong style="color:#1a1a2e;">⚠️ Manually updated stats</strong> — ${league} stats are updated manually. Last updated: <strong>${MANUAL_UPDATE_DATE}</strong>. For live data <a href="${link}" target="_blank" style="color:#0a2342;font-weight:700;">visit the official site →</a>
   </div>`;
 
-  let kboHtml = manualNotice("KBO", "https://eng.koreabaseball.com");
+  // ── KBO Last Appearance ──
+  const kboFmtDate = (d) => { const p=d.split("-"); return parseInt(p[2])+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][parseInt(p[1])-1]; };
+  const kboApps = [
+    { name:"Lachlan Wells",   flag:"🇦🇺", team:"LG Twins",     type:"pitcher", lastGame: KBO_PLAYERS.find(p=>p.name==="Lachlan Wells")?.kboGameLog?.[0] },
+    { name:"Jack O'Loughlin", flag:"🇦🇺", team:"Samsung Lions", type:"pitcher", lastGame: KBO_PLAYERS.find(p=>p.name==="Jack O'Loughlin")?.kboGameLog?.[0] },
+  ].filter(p => p.lastGame);
+  let kboLastHtml = "";
+  if (kboApps.length) {
+    const rows = kboApps.map(p => {
+      const g = p.lastGame;
+      const stat = p.type === "pitcher"
+        ? [g.dec?"("+g.dec+")":"", g.ip+" IP", g.h+" H", g.so+" K", g.bb+" BB", g.er+" ER"].filter(Boolean).join(", ")
+        : [g.h+"/"+g.ab, g.r?g.r+" R":"", g.hr?g.hr+" HR":"", g.rbi?g.rbi+" RBI":"", g.bb?g.bb+" BB":""].filter(Boolean).join(", ");
+      return "<li><span class='hl-name'>"+p.name+" "+p.flag+"</span> <span style='color:#aaa;font-size:11px;'>("+kboFmtDate(g.date)+")</span> — "+p.team+" "+g.opp+": <span class='hl-stats'>"+stat+"</span></li>";
+    }).join("");
+    kboLastHtml = "<div style='background:#fff8e8;border-left:4px solid #e8a020;padding:10px 16px;margin-bottom:0.5rem;border-radius:0 8px 8px 0;'><div style='font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#e8a020;margin-bottom:6px;'>⚡ Last Appearance</div><ul class='highlights-list' style='margin:0;'>"+rows+"</ul><div style='font-size:11px;color:#aaa;margin-top:6px;font-style:italic;'>Data entered manually — last updated 17 May 2026.</div></div>";
+  }
+  let kboHtml = kboLastHtml + manualNotice("KBO", "https://eng.koreabaseball.com");
   kboHtml += `<div class="level-section"><div class="level-heading"><span class="level-pill lv-kbo">KBO League — Korea</span><div class="level-line"></div><span class="level-count">${KBO_PLAYERS.length} players</span></div>`;
   KBO_PLAYERS.forEach((p, i) => {
     kboHtml += buildCard(p, "KBO", p.team, null, null, cardIdx++, "KBO League", p.kboStats);
